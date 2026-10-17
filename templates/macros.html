@@ -1,0 +1,32 @@
+{% macro tag_situacao(resposta) %}
+    <span class="tag tag-{{ resposta.situacao }}">{{ resposta.rotulo_situacao }}</span>
+{% endmacro %}
+
+
+{% macro cabecalho_questao(questao) %}
+    <p class="questao-cabecalho">
+        Nº {{ questao.id }} · {{ questao.disciplina }} · {{ questao.banca }} · {{ questao.ano }} · {{ questao.tipo }}
+    </p>
+{% endmacro %}
+
+
+{% macro texto_longo(texto) %}
+    <div class="texto-longo">{{ texto }}</div>
+{% endmacro %}
+
+
+{% macro lista_vazia(mensagem) %}
+    <p class="vazio">{{ mensagem }}</p>
+{% endmacro %}
+
+
+{% macro opcoes_resposta(questao, nome_campo="resposta") %}
+    <div class="alternativas">
+        {% for valor, texto in questao.opcoes() %}
+            <label class="alternativa">
+                <input type="radio" name="{{ nome_campo }}" value="{{ valor }}" required>
+                <span><strong>{{ valor }})</strong> {{ texto }}</span>
+            </label>
+        {% endfor %}
+    </div>
+{% endmacro %}

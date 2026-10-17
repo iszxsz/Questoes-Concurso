@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titulo %}Início{% endblock %} | Questões de Concurso</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header class="topo">
+        <div class="container topo-conteudo">
+            <a class="logo" href="/">Questões de Concurso</a>
+
+            <nav class="menu">
+                {% if session.get("tipo") == "aluno" %}
+                    <a href="/aluno">Início</a>
+                    <a href="/aluno/questoes">Questões</a>
+                    <a href="/aluno/resultados">Meus resultados</a>
+                {% elif session.get("tipo") == "professor" %}
+                    <a href="/professor">Início</a>
+                    <a href="/professor/questoes">Questões</a>
+                    <a href="/professor/alunos">Alunos</a>
+                {% else %}
+                    <a href="/login">Entrar</a>
+                    <a href="/cadastro">Criar conta</a>
+                {% endif %}
+            </nav>
+
+            {% if session.get("tipo") %}
+                <div class="usuario">
+                    <span>Olá, {{ session.get("nome") }}</span>
+                    <a href="/logout">Sair</a>
+                </div>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="container">
+        {% for categoria, mensagem in get_flashed_messages(with_categories=true) %}
+            <div class="alerta alerta-{{ categoria }}">{{ mensagem }}</div>
+        {% endfor %}
+
+        {% block conteudo %}{% endblock %}
+    </main>
+</body>
+</html>
