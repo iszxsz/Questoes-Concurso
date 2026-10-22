@@ -30,7 +30,7 @@ class Controller:
             g.usuario = self.usuario_logado()
 
             if self.TIPO_USUARIO is not None:
-                if g.usuario is None or g.usuario.tipo != self.TIPO_USUARIO:
+                if g.usuario is None or g.usuario.TIPO != self.TIPO_USUARIO:
                     return self.redirecionar("/login", "Faça login para continuar.", "erro")
 
             return metodo(**parametros)
