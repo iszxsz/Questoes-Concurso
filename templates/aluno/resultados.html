@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% from "macros.html" import tag_situacao, lista_vazia %}
+
+{% block titulo %}Meus resultados{% endblock %}
+
+{% block conteudo %}
+<h1>Meus resultados</h1>
+
+<div class="grade">
+    <div class="card">
+        <div class="numero-destaque">{{ desempenho.geral.total }}</div>
+        questões respondidas
+    </div>
+    <div class="card">
+        <div class="numero-destaque">{{ desempenho.geral.acertos }}</div>
+        acertos
+    </div>
+    <div class="card">
+        <div class="numero-destaque">{{ desempenho.geral.percentual }}%</div>
+        de aproveitamento
+    </div>
+</div>
+
+<h2>Por disciplina</h2>
+{% set disciplinas = desempenho.por_disciplina() %}
+{% if disciplinas %}
+    <div class="tabela-rolagem">
+        <table class="tabela">
+            <thead>
+                <tr>
+                    <th>Disciplina</th>
+                    <th>Respondidas</th>
+                    <th>Acertos</th>
+                    <th>Aproveitamento</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for disciplina in disciplinas %}
+                    <tr>
+                        <td>{{ disciplina.nome }}</td>
+                        <td>{{ disciplina.total }}</td>
+                        <td>{{ disciplina.acertos }}</td>
+                        <td>{{ disciplina.percentual }}%</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    {{ lista_vazia("Você ainda não respondeu nenhuma questão.") }}
+{% endif %}
+
+<h2>Histórico</h2>
+{% if respostas %}
+    <div class="tabela-rolagem">
+        <table class="tabela">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Questão</th>
+                    <th>Resposta</th>
+                    <th>Gabarito</th>
+                    <th>Situação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resposta in respostas %}
+                    <tr>
+                        <td>{{ resposta.data_formatada }}</td>
+                        <td><a href="/aluno/questoes/{{ resposta.questao_id }}">Nº {{ resposta.questao_id }}</a></td>
+                        <td>{{ resposta.resposta }}</td>
+                        <td>{{ resposta.questao().gabarito }}</td>
+                        <td>{{ tag_situacao(resposta) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    {{ lista_vazia("Seu histórico aparece aqui depois da primeira resposta.") }}
+{% endif %}
+{% endblock %}

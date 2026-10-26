@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% from "macros.html" import cabecalho_questao, lista_vazia %}
+
+{% block titulo %}Questões{% endblock %}
+
+{% block conteudo %}
+<h1>Questões</h1>
+
+<form class="filtros" method="get" action="/aluno/questoes">
+    <div class="form-grupo">
+        <label class="rotulo" for="disciplina">Disciplina</label>
+        <select id="disciplina" name="disciplina">
+            <option value="">Todas</option>
+            {% for disciplina in disciplinas %}
+                <option value="{{ disciplina }}" {% if filtros.disciplina == disciplina %}selected{% endif %}>{{ disciplina }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-grupo">
+        <label class="rotulo" for="banca">Banca</label>
+        <select id="banca" name="banca">
+            <option value="">Todas</option>
+            {% for banca in bancas %}
+                <option value="{{ banca }}" {% if filtros.banca == banca %}selected{% endif %}>{{ banca }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-grupo">
+        <label class="rotulo" for="tipo">Tipo</label>
+        <select id="tipo" name="tipo">
+            <option value="">Todos</option>
+            <option value="multipla" {% if filtros.tipo == "multipla" %}selected{% endif %}>Múltipla escolha</option>
+            <option value="certo_errado" {% if filtros.tipo == "certo_errado" %}selected{% endif %}>Certo ou errado</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn">Filtrar</button>
+    <a class="btn btn-secundario" href="/aluno/questoes">Limpar</a>
+</form>
+
+{% if questoes|length == 1 %}
+    <p>1 questão encontrada.</p>
+{% else %}
+    <p>{{ questoes|length }} questões encontradas.</p>
+{% endif %}
+
+{% for questao in questoes %}
+    <div class="card">
+        {{ cabecalho_questao(questao) }}
+        <p>{{ questao.enunciado|truncate(180) }}</p>
+        <div class="acoes">
+            <a class="btn" href="/aluno/questoes/{{ questao.id }}">Responder</a>
+        </div>
+    </div>
+{% else %}
+    {{ lista_vazia("Nenhuma questão encontrada com esses filtros.") }}
+{% endfor %}
+{% endblock %}
