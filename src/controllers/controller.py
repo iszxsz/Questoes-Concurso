@@ -29,6 +29,11 @@ class Controller:
             # o mesmo controller atende todo mundo, por isso o usuário fica no g e não no self
             g.usuario = self.usuario_logado()
 
+            if g.usuario is None:
+                session.pop("usuario_id", None)
+                session.pop("tipo", None)
+                session.pop("nome", None)
+
             if self.TIPO_USUARIO is not None:
                 if g.usuario is None or g.usuario.TIPO != self.TIPO_USUARIO:
                     return self.redirecionar("/login", "Faça login para continuar.", "erro")

@@ -1,5 +1,7 @@
 """Resposta de um aluno a uma questão."""
 
+from datetime import datetime, timezone
+
 from src import database
 from src.models.questao import Questao
 
@@ -31,6 +33,12 @@ class Resposta:
             return "Correta"
         return "Errada"
 
+    @property
+    def data_formatada(self):
+        """Data da resposta no horário local, no formato dd/mm/aaaa hh:mm."""
+        data_utc = datetime.strptime(self.respondida_em, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+        return data_utc.astimezone().strftime("%d/%m/%Y %H:%M")
+
     def questao(self):
         """Busca a questão que foi respondida."""
         return Questao.buscar_por_id(self.questao_id)
@@ -58,7 +66,6 @@ class Resposta:
         conexao.commit()
         self.id = cursor.lastrowid
 
-        # o CURRENT_TIMESTAMP do SQLite salva em UTC, fica 3h na frente do horário de Brasília... precisa tratar isso quando for mostrar a data na tela (T06)
         linha = conexao.execute(
             "SELECT respondida_em FROM resposta WHERE id = ?", (self.id,)
         ).fetchone()
