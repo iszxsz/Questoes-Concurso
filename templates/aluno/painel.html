@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block titulo %}Painel{% endblock %}
+
+{% block conteudo %}
+<h1>Olá, {{ aluno.primeiro_nome }}!</h1>
+<p>O que você quer fazer hoje?</p>
+
+<div class="grade">
+    <div class="card">
+        <h2>Questões</h2>
+        <p>Resolva questões de concurso e veja na hora se acertou.</p>
+        <a class="btn" href="/aluno/questoes">Resolver questões</a>
+    </div>
+
+    <div class="card">
+        <h2>Meus resultados</h2>
+        <p>Veja seu aproveitamento geral, por disciplina e o histórico de respostas.</p>
+        <a class="btn" href="/aluno/resultados">Ver resultados</a>
+    </div>
+</div>
+{% endblock %}
