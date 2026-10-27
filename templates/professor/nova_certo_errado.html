@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block titulo %}Nova questão de certo ou errado{% endblock %}
+
+{% block conteudo %}
+<div class="card">
+    <h1>Nova questão de certo ou errado</h1>
+
+    <form method="post" action="/professor/questoes/nova-certo-errado">
+        <div class="form-grupo">
+            <label class="rotulo" for="enunciado">Afirmação</label>
+            <textarea id="enunciado" name="enunciado" required>{{ dados.get("enunciado", "") }}</textarea>
+            <p class="ajuda">O aluno vai julgar se a afirmação está certa ou errada.</p>
+        </div>
+
+        <div class="filtros">
+            <div class="form-grupo">
+                <label class="rotulo" for="disciplina">Disciplina</label>
+                <input type="text" id="disciplina" name="disciplina" value="{{ dados.get('disciplina', '') }}" required>
+            </div>
+
+            <div class="form-grupo">
+                <label class="rotulo" for="banca">Banca</label>
+                <input type="text" id="banca" name="banca" value="{{ dados.get('banca', '') }}" required>
+            </div>
+
+            <div class="form-grupo">
+                <label class="rotulo" for="ano">Ano</label>
+                <input type="number" id="ano" name="ano" value="{{ dados.get('ano', '') }}" min="1990" max="2100" required>
+            </div>
+        </div>
+
+        <p class="rotulo">Gabarito</p>
+        <div class="alternativas">
+            {% for valor, texto in opcoes %}
+                <label class="alternativa">
+                    <input type="radio" name="gabarito" value="{{ valor }}" {% if dados.get("gabarito") == valor %}checked{% endif %} required>
+                    <span><strong>{{ valor }})</strong> {{ texto }}</span>
+                </label>
+            {% endfor %}
+        </div>
+
+        <div class="acoes">
+            <button type="submit" class="btn">Cadastrar</button>
+            <a class="btn btn-secundario" href="/professor/questoes">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

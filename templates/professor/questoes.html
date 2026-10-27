@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% from "macros.html" import lista_vazia %}
+
+{% block titulo %}Questões cadastradas{% endblock %}
+
+{% block conteudo %}
+<h1>Questões cadastradas</h1>
+
+<div class="acoes">
+    <a class="btn" href="/professor/questoes/nova-multipla">Nova múltipla escolha</a>
+    <a class="btn" href="/professor/questoes/nova-certo-errado">Nova certo ou errado</a>
+</div>
+
+<p>Total: {{ questoes|length }}</p>
+{% if questoes %}
+    <div class="tabela-rolagem">
+        <table class="tabela">
+            <thead>
+                <tr>
+                    <th>Nº</th>
+                    <th>Tipo</th>
+                    <th>Disciplina</th>
+                    <th>Banca</th>
+                    <th>Ano</th>
+                    <th>Gabarito</th>
+                    <th>Enunciado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for questao in questoes %}
+                    <tr>
+                        <td>{{ questao.id }}</td>
+                        <td>{{ questao.NOME_TIPO }}</td>
+                        <td>{{ questao.disciplina }}</td>
+                        <td>{{ questao.banca }}</td>
+                        <td>{{ questao.ano }}</td>
+                        <td>{{ questao.gabarito }}</td>
+                        <td>{{ questao.enunciado|truncate(80) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    {{ lista_vazia("Nenhuma questão cadastrada ainda.") }}
+{% endif %}
+{% endblock %}
