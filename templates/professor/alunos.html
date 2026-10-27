@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "macros.html" import lista_vazia %}
+
+{% block titulo %}Alunos{% endblock %}
+
+{% block conteudo %}
+<h1>Alunos</h1>
+
+{% if desempenhos %}
+    <div class="tabela-rolagem">
+        <table class="tabela">
+            <thead>
+                <tr>
+                    <th>Aluno</th>
+                    <th>Respondidas</th>
+                    <th>Acertos</th>
+                    <th>Aproveitamento</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for desempenho in desempenhos %}
+                    <tr>
+                        <td>
+                            {{ desempenho.aluno.nome }}
+                            <div class="ajuda">{{ desempenho.aluno.email }}</div>
+                        </td>
+                        <td>{{ desempenho.geral.total }}</td>
+                        <td>{{ desempenho.geral.acertos }}</td>
+                        <td>{{ desempenho.geral.percentual }}%</td>
+                        <td><a href="/professor/alunos/{{ desempenho.aluno.id }}">Ver detalhe</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    {{ lista_vazia("Nenhum aluno cadastrado ainda.") }}
+{% endif %}
+{% endblock %}

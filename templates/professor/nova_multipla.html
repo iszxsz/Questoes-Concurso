@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block titulo %}Nova questão de múltipla escolha{% endblock %}
+
+{% block conteudo %}
+<div class="card">
+    <h1>Nova questão de múltipla escolha</h1>
+
+    <form method="post" action="/professor/questoes/nova-multipla">
+        <div class="form-grupo">
+            <label class="rotulo" for="enunciado">Enunciado</label>
+            <textarea id="enunciado" name="enunciado" required>{{ dados.get("enunciado", "") }}</textarea>
+        </div>
+
+        <div class="filtros">
+            <div class="form-grupo">
+                <label class="rotulo" for="disciplina">Disciplina</label>
+                <input type="text" id="disciplina" name="disciplina" value="{{ dados.get('disciplina', '') }}" required>
+            </div>
+
+            <div class="form-grupo">
+                <label class="rotulo" for="banca">Banca</label>
+                <input type="text" id="banca" name="banca" value="{{ dados.get('banca', '') }}" required>
+            </div>
+
+            <div class="form-grupo">
+                <label class="rotulo" for="ano">Ano</label>
+                <input type="number" id="ano" name="ano" value="{{ dados.get('ano', '') }}" min="1990" max="2100" required>
+            </div>
+        </div>
+
+        <p class="rotulo">Alternativas</p>
+        <p class="ajuda">Preencha de 2 a 5, em ordem, sem pular letras.</p>
+        {% for letra in letras %}
+            {% set campo = "alternativa_" ~ letra|lower %}
+            <div class="form-grupo">
+                <label class="rotulo" for="{{ campo }}">{{ letra }})</label>
+                <input type="text" id="{{ campo }}" name="{{ campo }}" value="{{ dados.get(campo, '') }}" {% if loop.index <= 2 %}required{% endif %}>
+            </div>
+        {% endfor %}
+
+        <div class="form-grupo">
+            <label class="rotulo" for="gabarito">Gabarito</label>
+            <select id="gabarito" name="gabarito" required>
+                <option value="">Escolha a letra</option>
+                {% for letra in letras %}
+                    <option value="{{ letra }}" {% if dados.get("gabarito") == letra %}selected{% endif %}>{{ letra }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="acoes">
+            <button type="submit" class="btn">Cadastrar</button>
+            <a class="btn btn-secundario" href="/professor/questoes">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
