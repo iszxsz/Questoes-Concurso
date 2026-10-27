@@ -6,49 +6,7 @@
 {% block conteudo %}
 <h1>Meus resultados</h1>
 
-<div class="grade">
-    <div class="card">
-        <div class="numero-destaque">{{ desempenho.geral.total }}</div>
-        questões respondidas
-    </div>
-    <div class="card">
-        <div class="numero-destaque">{{ desempenho.geral.acertos }}</div>
-        acertos
-    </div>
-    <div class="card">
-        <div class="numero-destaque">{{ desempenho.geral.percentual }}%</div>
-        de aproveitamento
-    </div>
-</div>
-
-<h2>Por disciplina</h2>
-{% set disciplinas = desempenho.por_disciplina() %}
-{% if disciplinas %}
-    <div class="tabela-rolagem">
-        <table class="tabela">
-            <thead>
-                <tr>
-                    <th>Disciplina</th>
-                    <th>Respondidas</th>
-                    <th>Acertos</th>
-                    <th>Aproveitamento</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for disciplina in disciplinas %}
-                    <tr>
-                        <td>{{ disciplina.nome }}</td>
-                        <td>{{ disciplina.total }}</td>
-                        <td>{{ disciplina.acertos }}</td>
-                        <td>{{ disciplina.percentual }}%</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-{% else %}
-    {{ lista_vazia("Você ainda não respondeu nenhuma questão.") }}
-{% endif %}
+{% include "resumo_desempenho.html" %}
 
 <h2>Histórico</h2>
 {% if respostas %}

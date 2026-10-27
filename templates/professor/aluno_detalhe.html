@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% from "macros.html" import tag_situacao, lista_vazia %}
+
+{% block titulo %}{{ desempenho.aluno.nome }}{% endblock %}
+
+{% block conteudo %}
+<h1>{{ desempenho.aluno.nome }}</h1>
+<p>{{ desempenho.aluno.email }}</p>
+
+{% include "resumo_desempenho.html" %}
+
+<h2>Histórico</h2>
+{% if respostas %}
+    <div class="tabela-rolagem">
+        <table class="tabela">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Questão</th>
+                    <th>Resposta</th>
+                    <th>Gabarito</th>
+                    <th>Situação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resposta in respostas %}
+                    <tr>
+                        <td>{{ resposta.data_formatada }}</td>
+                        <td>Nº {{ resposta.questao_id }}</td>
+                        <td>{{ resposta.resposta }}</td>
+                        <td>{{ resposta.questao().gabarito }}</td>
+                        <td>{{ tag_situacao(resposta) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    {{ lista_vazia("Este aluno ainda não respondeu nenhuma questão.") }}
+{% endif %}
+
+<div class="acoes">
+    <a class="btn btn-secundario" href="/professor/alunos">Voltar para alunos</a>
+</div>
+{% endblock %}
