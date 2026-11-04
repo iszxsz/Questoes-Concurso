@@ -5,25 +5,30 @@ from src.models.usuario import Usuario
 class Aluno(Usuario):
 
     TIPO = "aluno"
-    NOME_TIPO = "Aluno"
 
     @classmethod
     def cadastrar(cls, nome, email, senha, confirmar_senha):
-        return super().cadastrar(nome, email, senha, confirmar_senha)
+        nome = Usuario.validar_nome(nome)
+        email = Usuario.validar_email(email)
 
-    @staticmethod
-    def buscar_por_id(usuario_id):
-        usuario = Usuario.buscar_por_id(usuario_id)
-        if isinstance(usuario, Aluno):
-            return usuario
-        return None
+        if Usuario.buscar_por_email(email) is not None:
+            raise ValueError("E-mail já cadastrado.")
 
-    @staticmethod
-    def listar():
+        senha = senha or ""
+        if len(senha) < 6:
+            raise ValueError("A senha deve ter pelo menos 6 caracteres.")
+        if senha != confirmar_senha:
+            raise ValueError("As senhas não conferem.")
+
+        aluno = cls(nome, email, Usuario.gerar_hash(senha))
+        aluno.salvar()
+        return aluno
+
+    @classmethod
+    def listar(cls):
         conexao = database.conectar()
         linhas = conexao.execute(
-            "SELECT * FROM usuario WHERE tipo = ? ORDER BY nome COLLATE NOCASE, id",
-            (Aluno.TIPO,),
+            "SELECT * FROM usuario WHERE tipo = ? ORDER BY nome", (cls.TIPO,)
         ).fetchall()
         conexao.close()
 
