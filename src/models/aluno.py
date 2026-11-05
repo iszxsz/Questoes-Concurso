@@ -1,34 +1,52 @@
+"""Aluno: usuário que se cadastra sozinho e responde questões."""
+
 from src import database
 from src.models.usuario import Usuario
 
 
 class Aluno(Usuario):
+    """Usuário do tipo aluno.
+
+    Attributes:
+        TAMANHO_MINIMO_SENHA (int): menor tamanho de senha aceito no cadastro.
+    """
 
     TIPO = "aluno"
+    TAMANHO_MINIMO_SENHA = 6
+
+    @classmethod
+    def validar_senha(cls, senha, confirmar_senha):
+        """Devolve a senha, ou lança ValueError se for curta ou diferente da confirmação."""
+        senha = senha or ""
+        if len(senha) < cls.TAMANHO_MINIMO_SENHA:
+            raise ValueError(
+                f"A senha deve ter pelo menos {cls.TAMANHO_MINIMO_SENHA} caracteres."
+            )
+        if senha != confirmar_senha:
+            raise ValueError("As senhas não conferem.")
+        return senha
 
     @classmethod
     def cadastrar(cls, nome, email, senha, confirmar_senha):
-        nome = Usuario.validar_nome(nome)
-        email = Usuario.validar_email(email)
+        """Valida os dados, cria e salva um novo aluno e devolve o objeto.
 
-        if Usuario.buscar_por_email(email) is not None:
-            raise ValueError("E-mail já cadastrado.")
+        Raises:
+            ValueError: com a mensagem da primeira regra que falhar.
+        """
+        nome = cls.validar_nome(nome)
+        email = cls.validar_email(email)
+        senha = cls.validar_senha(senha, confirmar_senha)
 
-        senha = senha or ""
-        if len(senha) < 6:
-            raise ValueError("A senha deve ter pelo menos 6 caracteres.")
-        if senha != confirmar_senha:
-            raise ValueError("As senhas não conferem.")
-
-        aluno = cls(nome, email, Usuario.gerar_hash(senha))
+        aluno = cls(nome, email, cls.gerar_hash(senha))
         aluno.salvar()
         return aluno
 
-    @classmethod
-    def listar(cls):
+    @staticmethod
+    def listar_todos():
+        """Devolve todos os alunos em ordem de nome."""
         conexao = database.conectar()
         linhas = conexao.execute(
-            "SELECT * FROM usuario WHERE tipo = ? ORDER BY nome", (cls.TIPO,)
+            "SELECT * FROM usuario WHERE tipo = ? ORDER BY nome", (Aluno.TIPO,)
         ).fetchall()
         conexao.close()
 
