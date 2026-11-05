@@ -88,6 +88,28 @@ QUESTOES_MULTIPLA = [
     },
 ]
 
+QUESTOES_CERTO_ERRADO = [
+    {
+        "id": 7,
+        "disciplina": "Direito Constitucional",
+        "banca": "Cebraspe",
+        "ano": 2022,
+        "enunciado": (
+            "Segundo a Constituição Federal de 1988, todo o poder emana do povo, "
+            "que o exerce por meio de representantes eleitos ou diretamente."
+        ),
+        "gabarito": "C",
+    },
+    {
+        "id": 8,
+        "disciplina": "Português",
+        "banca": "Cebraspe",
+        "ano": 2023,
+        "enunciado": 'Na oração "Choveu muito ontem", o sujeito é oculto.',
+        "gabarito": "E",
+    },
+]
+
 
 def apagar_banco():
     """Remove o arquivo do banco, se ele existir."""
@@ -144,6 +166,30 @@ def inserir_questoes_multipla(conexao, professor_id):
         )
 
 
+def inserir_questoes_certo_errado(conexao, professor_id):
+    """Insere as questões de certo ou errado de exemplo, sem alternativas.
+
+    Args:
+        conexao (sqlite3.Connection): conexão aberta com o banco.
+        professor_id (int): id do professor que fica como autor das questões.
+    """
+    for questao in QUESTOES_CERTO_ERRADO:
+        conexao.execute(
+            "INSERT INTO questao (id, tipo, enunciado, disciplina, banca, ano, "
+            "professor_id, gabarito) "
+            "VALUES (?, 'certo_errado', ?, ?, ?, ?, ?, ?)",
+            (
+                questao["id"],
+                questao["enunciado"],
+                questao["disciplina"],
+                questao["banca"],
+                questao["ano"],
+                professor_id,
+                questao["gabarito"],
+            ),
+        )
+
+
 def main():
     """Apaga o banco, cria as tabelas de novo e insere os dados de teste."""
     apagar_banco()
@@ -155,6 +201,7 @@ def main():
     inserir_usuario(conexao, ALUNO)
 
     inserir_questoes_multipla(conexao, professor_id)
+    inserir_questoes_certo_errado(conexao, professor_id)
 
     conexao.commit()
     conexao.close()
