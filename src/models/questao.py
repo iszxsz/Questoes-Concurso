@@ -1,5 +1,3 @@
-"""Classe abstrata de questão e acesso às questões no banco."""
-
 import json
 from abc import ABC, abstractmethod
 
@@ -15,7 +13,6 @@ class Questao(ABC):
     ANO_MAXIMO = 2100
 
     def __init__(self, enunciado, disciplina, banca, ano, professor_id, gabarito, id=None):
-        """Limpa os textos e valida textos, ano e gabarito."""
         self.id = id
         self.enunciado = enunciado.strip()
         self.disciplina = disciplina.strip()
@@ -42,6 +39,20 @@ class Questao(ABC):
     @abstractmethod
     def opcoes(self):
         """Lista de pares (valor, texto) das opções da questão."""
+
+    def para_formulario(self):
+        """Campos comuns da questão no formato do formulário, para editar."""
+        return {
+            "enunciado": self.enunciado,
+            "disciplina": self.disciplina,
+            "banca": self.banca,
+            "ano": str(self.ano),
+            "gabarito": self.gabarito,
+        }
+
+    def alternativas_em_texto(self):
+        """Alternativas no formato gravado no banco; None para tipos sem alternativas."""
+        return None
 
     @property
     def valores_validos(self):
@@ -73,10 +84,6 @@ class Questao(ABC):
 
     def salvar(self):
         """Insere a questão no banco e preenche o id."""
-        alternativas = getattr(self, "alternativas", None)
-        if alternativas is not None:
-            alternativas = json.dumps(alternativas, ensure_ascii=False)
-
         conexao = database.conectar()
         cursor = conexao.execute(
             "INSERT INTO questao (tipo, enunciado, disciplina, banca, ano, "
@@ -88,12 +95,55 @@ class Questao(ABC):
                 self.banca,
                 self.ano,
                 self.professor_id,
-                alternativas,
+                self.alternativas_em_texto(),
                 self.gabarito,
             ),
         )
         conexao.commit()
         self.id = cursor.lastrowid
+        conexao.close()
+
+    def atualizar(self):
+        """Grava no banco os dados atuais de uma questão que já existe."""
+        conexao = database.conectar()
+        conexao.execute(
+            "UPDATE questao SET enunciado = ?, disciplina = ?, banca = ?, ano = ?, "
+            "alternativas = ?, gabarito = ? WHERE id = ?",
+            (
+                self.enunciado,
+                self.disciplina,
+                self.banca,
+                self.ano,
+                self.alternativas_em_texto(),
+                self.gabarito,
+                self.id,
+            ),
+        )
+        conexao.commit()
+        conexao.close()
+
+    def tem_respostas(self):
+        """True se algum aluno já respondeu esta questão."""
+        conexao = database.conectar()
+        linha = conexao.execute(
+            "SELECT COUNT(*) AS total FROM resposta WHERE questao_id = ?", (self.id,)
+        ).fetchone()
+        conexao.close()
+        return linha["total"] > 0
+
+    def excluir(self):
+        """Apaga a questão e a tira dos simulados em que estiver.
+
+        Raises:
+            ValueError: se a questão já tiver respostas.
+        """
+        if self.tem_respostas():
+            raise ValueError("Esta questão já tem respostas e não pode ser excluída.")
+
+        conexao = database.conectar()
+        conexao.execute("DELETE FROM simulado_questao WHERE questao_id = ?", (self.id,))
+        conexao.execute("DELETE FROM questao WHERE id = ?", (self.id,))
+        conexao.commit()
         conexao.close()
 
     @staticmethod

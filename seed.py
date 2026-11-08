@@ -111,6 +111,12 @@ QUESTOES_CERTO_ERRADO = [
 ]
 
 
+SIMULADO = {
+    "titulo": "Simulado Cebraspe: Português e Direito",
+    "questoes": [2, 5, 7, 8],
+}
+
+
 def apagar_banco():
     """Remove o arquivo do banco, se ele existir."""
     if os.path.exists(database.CAMINHO_BANCO):
@@ -190,6 +196,26 @@ def inserir_questoes_certo_errado(conexao, professor_id):
         )
 
 
+def inserir_simulado(conexao, professor_id):
+    """Insere o simulado de exemplo com as questões na ordem da lista.
+
+    Args:
+        conexao (sqlite3.Connection): conexão aberta com o banco.
+        professor_id (int): id do professor que fica como autor do simulado.
+    """
+    cursor = conexao.execute(
+        "INSERT INTO simulado (titulo, professor_id) VALUES (?, ?)",
+        (SIMULADO["titulo"], professor_id),
+    )
+    simulado_id = cursor.lastrowid
+
+    for posicao, questao_id in enumerate(SIMULADO["questoes"], start=1):
+        conexao.execute(
+            "INSERT INTO simulado_questao (simulado_id, questao_id, posicao) VALUES (?, ?, ?)",
+            (simulado_id, questao_id, posicao),
+        )
+
+
 def main():
     """Apaga o banco, cria as tabelas de novo e insere os dados de teste."""
     apagar_banco()
@@ -202,6 +228,7 @@ def main():
 
     inserir_questoes_multipla(conexao, professor_id)
     inserir_questoes_certo_errado(conexao, professor_id)
+    inserir_simulado(conexao, professor_id)
 
     conexao.commit()
     conexao.close()

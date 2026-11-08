@@ -9,14 +9,17 @@ from src.models.questao import Questao
 class Resposta:
     """Resposta enviada por um aluno, já corrigida."""
 
-    def __init__(self, aluno_id, questao_id, resposta, situacao, respondida_em=None, id=None):
-        """Guarda os dados da resposta."""
+    def __init__(
+        self, aluno_id, questao_id, resposta, situacao, respondida_em=None, id=None, simulado_id=None
+    ):
+        """Guarda os dados da resposta. simulado_id fica None fora de simulado."""
         self.id = id
         self.aluno_id = aluno_id
         self.questao_id = questao_id
         self.resposta = resposta
         self.situacao = situacao
         self.respondida_em = respondida_em
+        self.simulado_id = simulado_id
 
     def __str__(self):
         return f"Questão {self.questao_id} · {self.resposta} · {self.rotulo_situacao}"
@@ -44,7 +47,7 @@ class Resposta:
         return Questao.buscar_por_id(self.questao_id)
 
     @staticmethod
-    def registrar(aluno_id, questao, resposta):
+    def registrar(aluno_id, questao, resposta, simulado_id=None):
         """Valida e corrige pela própria questão, salva e devolve a resposta.
 
         Se a resposta for inválida, o ValueError da questão sobe e nada é salvo.
@@ -52,7 +55,7 @@ class Resposta:
         resposta_limpa = questao.validar_resposta(resposta)
         situacao = questao.corrigir(resposta_limpa)
 
-        nova = Resposta(aluno_id, questao.id, resposta_limpa, situacao)
+        nova = Resposta(aluno_id, questao.id, resposta_limpa, situacao, simulado_id=simulado_id)
         nova.salvar()
         return nova
 
@@ -60,8 +63,9 @@ class Resposta:
         """Insere no banco e preenche o id e a data da resposta."""
         conexao = database.conectar()
         cursor = conexao.execute(
-            "INSERT INTO resposta (aluno_id, questao_id, resposta, situacao) VALUES (?, ?, ?, ?)",
-            (self.aluno_id, self.questao_id, self.resposta, self.situacao),
+            "INSERT INTO resposta (aluno_id, questao_id, resposta, situacao, simulado_id) "
+            "VALUES (?, ?, ?, ?, ?)",
+            (self.aluno_id, self.questao_id, self.resposta, self.situacao, self.simulado_id),
         )
         conexao.commit()
         self.id = cursor.lastrowid
@@ -82,6 +86,7 @@ class Resposta:
             linha["situacao"],
             linha["respondida_em"],
             linha["id"],
+            linha["simulado_id"],
         )
 
     @staticmethod
@@ -91,6 +96,21 @@ class Resposta:
         linhas = conexao.execute(
             "SELECT * FROM resposta WHERE aluno_id = ? ORDER BY respondida_em DESC, id DESC",
             (aluno_id,),
+        ).fetchall()
+        conexao.close()
+
+        respostas = []
+        for linha in linhas:
+            respostas.append(Resposta.de_linha(linha))
+        return respostas
+
+    @staticmethod
+    def listar_por_simulado(simulado_id, aluno_id):
+        """Respostas do aluno em um simulado, na ordem em que foram salvas."""
+        conexao = database.conectar()
+        linhas = conexao.execute(
+            "SELECT * FROM resposta WHERE simulado_id = ? AND aluno_id = ? ORDER BY id",
+            (simulado_id, aluno_id),
         ).fetchall()
         conexao.close()
 

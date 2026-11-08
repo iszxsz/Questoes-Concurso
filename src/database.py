@@ -26,13 +26,27 @@ CREATE TABLE IF NOT EXISTS questao (
     gabarito TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS simulado (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    titulo TEXT NOT NULL,
+    professor_id INTEGER NOT NULL REFERENCES usuario (id)
+);
+
+CREATE TABLE IF NOT EXISTS simulado_questao (
+    simulado_id INTEGER NOT NULL REFERENCES simulado (id),
+    questao_id INTEGER NOT NULL REFERENCES questao (id),
+    posicao INTEGER NOT NULL,
+    PRIMARY KEY (simulado_id, questao_id)
+);
+
 CREATE TABLE IF NOT EXISTS resposta (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     aluno_id INTEGER NOT NULL REFERENCES usuario (id),
     questao_id INTEGER NOT NULL REFERENCES questao (id),
     resposta TEXT NOT NULL,
     situacao TEXT NOT NULL CHECK (situacao IN ('correta', 'errada')),
-    respondida_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    respondida_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    simulado_id INTEGER REFERENCES simulado (id)
 );
 """
 

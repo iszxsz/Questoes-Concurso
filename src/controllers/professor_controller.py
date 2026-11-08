@@ -9,10 +9,11 @@ from src.models.questao import Questao
 from src.models.questao_certo_errado import QuestaoCertoErrado
 from src.models.questao_multipla import QuestaoMultipla
 from src.models.resposta import Resposta
+from src.models.simulado import Simulado
 
 
 class ProfessorController(Controller):
-    """Cadastro de questões e acompanhamento dos alunos."""
+    """Cadastro de questões e simulados e acompanhamento dos alunos."""
 
     TIPO_USUARIO = "professor"
 
@@ -31,6 +32,30 @@ class ProfessorController(Controller):
             "professor_nova_certo_errado",
             self.nova_certo_errado,
             ("GET", "POST"),
+        )
+        self.adicionar_rota(
+            "/professor/questoes/<int:questao_id>/editar",
+            "professor_editar_questao",
+            self.editar_questao,
+            ("GET", "POST"),
+        )
+        self.adicionar_rota(
+            "/professor/questoes/<int:questao_id>/excluir",
+            "professor_excluir_questao",
+            self.excluir_questao,
+            ("POST",),
+        )
+        self.adicionar_rota("/professor/simulados", "professor_simulados", self.simulados)
+        self.adicionar_rota(
+            "/professor/simulados/novo",
+            "professor_novo_simulado",
+            self.novo_simulado,
+            ("GET", "POST"),
+        )
+        self.adicionar_rota(
+            "/professor/simulados/<int:simulado_id>",
+            "professor_simulado_detalhe",
+            self.simulado_detalhe,
         )
         self.adicionar_rota("/professor/alunos", "professor_alunos", self.alunos)
         self.adicionar_rota(
@@ -56,21 +81,8 @@ class ProfessorController(Controller):
 
         if request.method == "POST":
             dados = request.form.to_dict()
-
-            alternativas = []
-            for letra in QuestaoMultipla.LETRAS:
-                alternativas.append(dados.get("alternativa_" + letra.lower(), ""))
-
             try:
-                questao = QuestaoMultipla(
-                    dados.get("enunciado", ""),
-                    dados.get("disciplina", ""),
-                    dados.get("banca", ""),
-                    dados.get("ano", ""),
-                    self.usuario.id,
-                    alternativas,
-                    dados.get("gabarito", ""),
-                )
+                questao = QuestaoMultipla.de_formulario(dados, self.usuario.id)
                 questao.salvar()
             except ValueError as erro:
                 self.avisar_erro(str(erro))
@@ -89,16 +101,8 @@ class ProfessorController(Controller):
 
         if request.method == "POST":
             dados = request.form.to_dict()
-
             try:
-                questao = QuestaoCertoErrado(
-                    dados.get("enunciado", ""),
-                    dados.get("disciplina", ""),
-                    dados.get("banca", ""),
-                    dados.get("ano", ""),
-                    self.usuario.id,
-                    dados.get("gabarito", ""),
-                )
+                questao = QuestaoCertoErrado.de_formulario(dados, self.usuario.id)
                 questao.salvar()
             except ValueError as erro:
                 self.avisar_erro(str(erro))
@@ -109,6 +113,93 @@ class ProfessorController(Controller):
 
         return self.renderizar(
             "professor/nova_certo_errado.html", dados=dados, opcoes=QuestaoCertoErrado.OPCOES
+        )
+
+    def editar_questao(self, questao_id):
+        """Mostra o formulário já preenchido e grava as alterações da questão."""
+        questao = Questao.buscar_por_id(questao_id)
+        if questao is None:
+            return self.redirecionar("/professor/questoes", "Questão não encontrada.", "erro")
+
+        dados = questao.para_formulario()
+
+        if request.method == "POST":
+            dados = request.form.to_dict()
+            try:
+                editada = questao.de_formulario(dados, questao.professor_id, questao.id)
+                editada.atualizar()
+            except ValueError as erro:
+                self.avisar_erro(str(erro))
+            else:
+                return self.redirecionar(
+                    "/professor/questoes", f"Questão nº {questao.id} atualizada."
+                )
+
+        if questao.TIPO == QuestaoMultipla.TIPO:
+            pagina = "professor/nova_multipla.html"
+        else:
+            pagina = "professor/nova_certo_errado.html"
+
+        return self.renderizar(
+            pagina,
+            dados=dados,
+            questao=questao,
+            letras=QuestaoMultipla.LETRAS,
+            opcoes=QuestaoCertoErrado.OPCOES,
+        )
+
+    def excluir_questao(self, questao_id):
+        """Exclui a questão, se ela ainda não tiver respostas."""
+        questao = Questao.buscar_por_id(questao_id)
+        if questao is None:
+            return self.redirecionar("/professor/questoes", "Questão não encontrada.", "erro")
+
+        try:
+            questao.excluir()
+        except ValueError as erro:
+            return self.redirecionar("/professor/questoes", str(erro), "erro")
+
+        return self.redirecionar("/professor/questoes", f"Questão nº {questao.id} excluída.")
+
+    def simulados(self):
+        """Lista os simulados cadastrados."""
+        return self.renderizar("professor/simulados.html", simulados=Simulado.listar_todos())
+
+    def novo_simulado(self):
+        """Mostra as questões para escolher e cria o simulado."""
+        titulo = ""
+        escolhidas = []
+
+        if request.method == "POST":
+            titulo = request.form.get("titulo", "")
+            escolhidas = request.form.getlist("questoes")
+            try:
+                simulado = Simulado.montar(titulo, self.usuario.id, escolhidas)
+            except ValueError as erro:
+                self.avisar_erro(str(erro))
+            else:
+                return self.redirecionar(
+                    f"/professor/simulados/{simulado.id}",
+                    f"Simulado criado com {len(simulado)} questões.",
+                )
+
+        return self.renderizar(
+            "professor/novo_simulado.html",
+            titulo=titulo,
+            escolhidas=escolhidas,
+            questoes=Questao.buscar(),
+        )
+
+    def simulado_detalhe(self, simulado_id):
+        """Mostra as questões do simulado e o resultado de cada aluno que o fez."""
+        simulado = Simulado.buscar_por_id(simulado_id)
+        if simulado is None:
+            return self.redirecionar("/professor/simulados", "Simulado não encontrado.", "erro")
+
+        return self.renderizar(
+            "professor/simulado_detalhe.html",
+            simulado=simulado,
+            resultados=simulado.resultados(),
         )
 
     def alunos(self):

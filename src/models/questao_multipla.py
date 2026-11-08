@@ -1,5 +1,7 @@
 """Questão de múltipla escolha."""
 
+import json
+
 from src.models.questao import Questao
 
 
@@ -33,3 +35,32 @@ class QuestaoMultipla(Questao):
         for posicao, texto in enumerate(self.alternativas):
             pares.append((self.LETRAS[posicao], texto))
         return pares
+
+    @classmethod
+    def de_formulario(cls, dados, professor_id, id=None):
+        """Cria a questão lendo as alternativas dos campos alternativa_a a alternativa_e."""
+        alternativas = []
+        for letra in cls.LETRAS:
+            alternativas.append(dados.get("alternativa_" + letra.lower(), ""))
+
+        return cls(
+            dados.get("enunciado", ""),
+            dados.get("disciplina", ""),
+            dados.get("banca", ""),
+            dados.get("ano", ""),
+            professor_id,
+            alternativas,
+            dados.get("gabarito", ""),
+            id,
+        )
+
+    def para_formulario(self):
+        """Campos comuns mais um campo para cada alternativa."""
+        dados = super().para_formulario()
+        for letra, texto in self.opcoes():
+            dados["alternativa_" + letra.lower()] = texto
+        return dados
+
+    def alternativas_em_texto(self):
+        """Alternativas em JSON, como ficam gravadas no banco."""
+        return json.dumps(self.alternativas, ensure_ascii=False)
