@@ -6,45 +6,45 @@
 {% block conteudo %}
 <h1>Questões</h1>
 
-<form class="filtros" method="get" action="/aluno/questoes">
-    <div class="form-grupo">
-        <label class="rotulo" for="disciplina">Disciplina</label>
-        <select id="disciplina" name="disciplina">
-            <option value="">Todas</option>
-            {% for disciplina in disciplinas %}
-                <option value="{{ disciplina }}" {% if filtros.disciplina == disciplina %}selected{% endif %}>{{ disciplina }}</option>
-            {% endfor %}
-        </select>
-    </div>
+<div class="card card-filtros">
+    <form class="filtros" method="get" action="/aluno/questoes">
+        <div class="form-grupo">
+            <label class="rotulo" for="disciplina">Disciplina</label>
+            <select id="disciplina" name="disciplina">
+                <option value="">Todas</option>
+                {% for disciplina in disciplinas %}
+                    <option value="{{ disciplina }}" {% if filtros.disciplina == disciplina %}selected{% endif %}>{{ disciplina }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-    <div class="form-grupo">
-        <label class="rotulo" for="banca">Banca</label>
-        <select id="banca" name="banca">
-            <option value="">Todas</option>
-            {% for banca in bancas %}
-                <option value="{{ banca }}" {% if filtros.banca == banca %}selected{% endif %}>{{ banca }}</option>
-            {% endfor %}
-        </select>
-    </div>
+        <div class="form-grupo">
+            <label class="rotulo" for="banca">Banca</label>
+            <select id="banca" name="banca">
+                <option value="">Todas</option>
+                {% for banca in bancas %}
+                    <option value="{{ banca }}" {% if filtros.banca == banca %}selected{% endif %}>{{ banca }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-    <div class="form-grupo">
-        <label class="rotulo" for="tipo">Tipo</label>
-        <select id="tipo" name="tipo">
-            <option value="">Todos</option>
-            <option value="multipla" {% if filtros.tipo == "multipla" %}selected{% endif %}>Múltipla escolha</option>
-            <option value="certo_errado" {% if filtros.tipo == "certo_errado" %}selected{% endif %}>Certo ou errado</option>
-        </select>
-    </div>
+        <div class="form-grupo">
+            <label class="rotulo" for="tipo">Tipo</label>
+            <select id="tipo" name="tipo">
+                <option value="">Todos</option>
+                <option value="multipla" {% if filtros.tipo == "multipla" %}selected{% endif %}>Múltipla escolha</option>
+                <option value="certo_errado" {% if filtros.tipo == "certo_errado" %}selected{% endif %}>Certo ou errado</option>
+            </select>
+        </div>
 
-    <button type="submit" class="btn">Filtrar</button>
-    <a class="btn btn-secundario" href="/aluno/questoes">Limpar</a>
-</form>
+        <button type="submit" class="btn">Filtrar</button>
+        <a class="btn btn-secundario" href="/aluno/questoes">Limpar</a>
+    </form>
+</div>
 
-{% if questoes|length == 1 %}
-    <p>1 questão encontrada.</p>
-{% else %}
-    <p>{{ questoes|length }} questões encontradas.</p>
-{% endif %}
+<p class="contador">
+    {% if questoes|length == 1 %}1 questão encontrada.{% else %}{{ questoes|length }} questões encontradas.{% endif %}
+</p>
 
 {% for questao in questoes %}
     <div class="card">

@@ -3,32 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#fffcf5">
     <title>{% block titulo %}Início{% endblock %} | Questões de Concurso</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,500..800,0..100&family=Nunito:wght@400;600;700;800&display=swap">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+    {% macro link_menu(caminho, href, texto, exato=false, prefixo="") %}
+        {% set ativo = (caminho == href) if exato else (caminho == href or caminho.startswith(href ~ "/")) %}
+        <a href="{{ href }}" {% if ativo %}aria-current="page"{% endif %}>{% if prefixo %}<span class="so-desktop">{{ prefixo }} </span>{% endif %}{{ texto }}</a>
+    {% endmacro %}
+
     <header class="topo">
         <div class="container topo-conteudo">
-            <a class="logo" href="/">Questões de Concurso</a>
+            <a class="logo" href="/">
+                <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4 7.5c3.6-1.6 7.6-1.4 12 1v17c-4.4-2.4-8.4-2.6-12-1z"/>
+                    <path d="M28 7.5c-3.6-1.6-7.6-1.4-12 1v17c4.4-2.4 8.4-2.6 12-1z"/>
+                    <path d="M20 12.5c1.8-.6 3.5-.7 5-.3M20 16.5c1.8-.6 3.5-.7 5-.3"/>
+                </svg>
+                <span>Questões de <span class="marca-texto">Concurso</span></span>
+            </a>
 
-            <nav class="menu">
+            <nav class="menu" aria-label="Menu principal">
                 {% if session.get("tipo") == "aluno" %}
-                    <a href="/aluno">Início</a>
-                    <a href="/aluno/questoes">Questões</a>
-                    <a href="/aluno/resultados">Meus resultados</a>
+                    {{ link_menu(request.path, "/aluno", "Início", exato=true) }}
+                    {{ link_menu(request.path, "/aluno/questoes", "Questões") }}
+                    {{ link_menu(request.path, "/aluno/simulados", "Simulados") }}
+                    {{ link_menu(request.path, "/aluno/resultados", "resultados", prefixo="Meus") }}
                 {% elif session.get("tipo") == "professor" %}
-                    <a href="/professor">Início</a>
-                    <a href="/professor/questoes">Questões</a>
-                    <a href="/professor/alunos">Alunos</a>
+                    {{ link_menu(request.path, "/professor", "Início", exato=true) }}
+                    {{ link_menu(request.path, "/professor/questoes", "Questões") }}
+                    {{ link_menu(request.path, "/professor/simulados", "Simulados") }}
+                    {{ link_menu(request.path, "/professor/alunos", "Alunos") }}
                 {% else %}
-                    <a href="/login">Entrar</a>
-                    <a href="/cadastro">Criar conta</a>
+                    {{ link_menu(request.path, "/login", "Entrar") }}
+                    {{ link_menu(request.path, "/cadastro", "Criar conta") }}
                 {% endif %}
             </nav>
 
             {% if session.get("tipo") %}
                 <div class="usuario">
-                    <span>Olá, {{ session.get("nome") }}</span>
+                    <span class="ola">Olá, <strong>{{ session.get("nome") }}</strong></span>
                     <a href="/logout">Sair</a>
                 </div>
             {% endif %}
@@ -37,10 +55,12 @@
 
     <main class="container">
         {% for categoria, mensagem in get_flashed_messages(with_categories=true) %}
-            <div class="alerta alerta-{{ categoria }}">{{ mensagem }}</div>
+            <div class="alerta alerta-{{ categoria }}" role="status">{{ mensagem }}</div>
         {% endfor %}
 
         {% block conteudo %}{% endblock %}
     </main>
+
+    <footer class="rodape">Bons estudos. Uma questão por vez.</footer>
 </body>
 </html>

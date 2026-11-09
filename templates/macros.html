@@ -4,9 +4,13 @@
 
 
 {% macro cabecalho_questao(questao) %}
-    <p class="questao-cabecalho">
-        Nº {{ questao.id }} · {{ questao.disciplina }} · {{ questao.banca }} · {{ questao.ano }} · {{ questao.NOME_TIPO }}
-    </p>
+    <ul class="questao-cabecalho">
+        <li class="numero">Nº {{ questao.id }}</li>
+        <li>{{ questao.disciplina }}</li>
+        <li>{{ questao.banca }}</li>
+        <li>{{ questao.ano }}</li>
+        <li>{{ questao.NOME_TIPO }}</li>
+    </ul>
 {% endmacro %}
 
 
@@ -20,13 +24,42 @@
 {% endmacro %}
 
 
-{% macro opcoes_resposta(questao, nome_campo="resposta") %}
+{% macro barra_percentual(percentual) %}
+    <span class="percentual">
+        <strong>{{ percentual }}%</strong>
+        <span class="barra" aria-hidden="true"><span style="width: {{ [[percentual, 0]|max, 100]|min }}%"></span></span>
+    </span>
+{% endmacro %}
+
+
+{% macro opcoes_resposta(questao, nome_campo="resposta", marcada=None) %}
     <div class="alternativas">
         {% for valor, texto in questao.opcoes() %}
             <label class="alternativa">
-                <input type="radio" name="{{ nome_campo }}" value="{{ valor }}" required>
-                <span><strong>{{ valor }})</strong> {{ texto }}</span>
+                <input type="radio" name="{{ nome_campo }}" value="{{ valor }}" {% if valor == marcada %}checked{% endif %} required>
+                <span class="letra">{{ valor }}</span>
+                <span class="alternativa-texto">{{ texto }}</span>
             </label>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+
+{# mostra as opções já corrigidas: gabarito em verde, resposta errada do aluno em terracota #}
+{% macro opcoes_corrigidas(questao, resposta=None) %}
+    <div class="alternativas">
+        {% for valor, texto in questao.opcoes() %}
+            {% set eh_gabarito = valor == questao.gabarito %}
+            {% set eh_erro = resposta and valor == resposta.resposta and not eh_gabarito %}
+            <div class="alternativa {% if eh_gabarito %}alternativa-correta{% elif eh_erro %}alternativa-errada{% endif %}">
+                <span class="letra">{{ valor }}</span>
+                <span class="alternativa-texto">{{ texto }}</span>
+                {% if eh_gabarito %}
+                    <span class="marcador">gabarito</span>
+                {% elif eh_erro %}
+                    <span class="marcador">sua resposta</span>
+                {% endif %}
+            </div>
         {% endfor %}
     </div>
 {% endmacro %}

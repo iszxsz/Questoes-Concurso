@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "macros.html" import lista_vazia, tag_situacao %}
+
+{% block titulo %}Simulados{% endblock %}
+
+{% block conteudo %}
+<h1>Simulados</h1>
+<p class="subtitulo">Cada simulado pode ser feito uma única vez, com todas as questões em uma página.</p>
+
+{% for resultado in resultados %}
+    {% set simulado = resultado.simulado %}
+    <div class="card">
+        <h2>{{ simulado.titulo }}</h2>
+        <p class="contador">{{ simulado|length }} questões{% if resultado.feito %} · <span class="tag tag-correta">feito</span>{% endif %}</p>
+
+        {% if resultado.feito %}
+            <p>Você acertou <strong>{{ resultado.geral.acertos }} de {{ resultado.geral.total }}</strong> ({{ resultado.geral.percentual }}%).</p>
+            <span class="barra" aria-hidden="true"><span style="width: {{ [[resultado.geral.percentual, 0]|max, 100]|min }}%"></span></span>
+            <div class="acoes">
+                <a class="btn btn-secundario" href="/aluno/simulados/{{ simulado.id }}/resultado">Ver resultado</a>
+            </div>
+        {% elif simulado|length > 0 %}
+            <div class="acoes">
+                <a class="btn" href="/aluno/simulados/{{ simulado.id }}">Fazer simulado</a>
+            </div>
+        {% endif %}
+    </div>
+{% else %}
+    {{ lista_vazia("Nenhum simulado disponível ainda.") }}
+{% endfor %}
+{% endblock %}

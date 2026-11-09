@@ -24,11 +24,11 @@
             <tbody>
                 {% for resposta in respostas %}
                     <tr>
-                        <td>{{ resposta.data_formatada }}</td>
-                        <td><a href="/aluno/questoes/{{ resposta.questao_id }}">Nº {{ resposta.questao_id }}</a></td>
-                        <td>{{ resposta.resposta }}</td>
-                        <td>{{ resposta.questao().gabarito }}</td>
-                        <td>{{ tag_situacao(resposta) }}</td>
+                        <td data-label="Data">{{ resposta.data_formatada }}</td>
+                        <td data-label="Questão" class="col-numero"><a href="/aluno/questoes/{{ resposta.questao_id }}">Nº {{ resposta.questao_id }}</a></td>
+                        <td data-label="Resposta">{{ resposta.resposta }}</td>
+                        <td data-label="Gabarito">{{ resposta.questao().gabarito }}</td>
+                        <td data-label="Situação">{{ tag_situacao(resposta) }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% from "macros.html" import cabecalho_questao, texto_longo, tag_situacao, opcoes_corrigidas %}
+
+{% block titulo %}Resultado: {{ resultado.simulado.titulo }}{% endblock %}
+
+{% block conteudo %}
+<h1>{{ resultado.simulado.titulo }}</h1>
+
+{% set desempenho = resultado %}
+{% include "resumo_desempenho.html" %}
+
+<h2>Questão por questão</h2>
+{% for questao, resposta in resultado.itens() %}
+    <div class="card">
+        <h3 class="numero-questao"><span>{{ loop.index }}</span> Questão</h3>
+        {{ cabecalho_questao(questao) }}
+
+        {% if resposta %}
+            <div class="veredito">
+                {{ tag_situacao(resposta) }}
+                <p>Você marcou <strong>{{ resposta.resposta }}) {{ questao.texto_da_opcao(resposta.resposta) }}</strong>.</p>
+            </div>
+        {% endif %}
+
+        {{ texto_longo(questao.enunciado) }}
+        {{ opcoes_corrigidas(questao, resposta) }}
+    </div>
+{% endfor %}
+
+<div class="acoes">
+    <a class="btn btn-secundario" href="/aluno/simulados">Voltar para simulados</a>
+    <a class="btn btn-secundario" href="/aluno/resultados">Meus resultados</a>
+</div>
+{% endblock %}

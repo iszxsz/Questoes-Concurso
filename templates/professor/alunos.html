@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "macros.html" import lista_vazia %}
+{% from "macros.html" import lista_vazia, barra_percentual %}
 
 {% block titulo %}Alunos{% endblock %}
 
@@ -21,14 +21,14 @@
             <tbody>
                 {% for desempenho in desempenhos %}
                     <tr>
-                        <td>
-                            {{ desempenho.aluno.nome }}
+                        <td class="td-bloco">
+                            <strong>{{ desempenho.aluno.nome }}</strong>
                             <div class="ajuda">{{ desempenho.aluno.email }}</div>
                         </td>
-                        <td>{{ desempenho.geral.total }}</td>
-                        <td>{{ desempenho.geral.acertos }}</td>
-                        <td>{{ desempenho.geral.percentual }}%</td>
-                        <td><a href="/professor/alunos/{{ desempenho.aluno.id }}">Ver detalhe</a></td>
+                        <td data-label="Respondidas">{{ desempenho.geral.total }}</td>
+                        <td data-label="Acertos">{{ desempenho.geral.acertos }}</td>
+                        <td data-label="Aproveitamento">{{ barra_percentual(desempenho.geral.percentual) }}</td>
+                        <td class="td-acoes"><a class="btn btn-secundario btn-pequeno" href="/professor/alunos/{{ desempenho.aluno.id }}">Ver detalhe</a></td>
                     </tr>
                 {% endfor %}
             </tbody>

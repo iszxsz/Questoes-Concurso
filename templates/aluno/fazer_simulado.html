@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% from "macros.html" import cabecalho_questao, texto_longo, opcoes_resposta %}
+
+{% block titulo %}{{ simulado.titulo }}{% endblock %}
+
+{% block conteudo %}
+<h1>{{ simulado.titulo }}</h1>
+<p class="subtitulo">{{ simulado|length }} questões. Responda todas e envie no final; não é possível refazer.</p>
+
+<form method="post" action="/aluno/simulados/{{ simulado.id }}">
+    {% for questao in simulado.questoes %}
+        <div class="card">
+            <h2 class="numero-questao"><span>{{ loop.index }}</span> de {{ simulado|length }}</h2>
+            {{ cabecalho_questao(questao) }}
+            {{ texto_longo(questao.enunciado) }}
+            {{ opcoes_resposta(questao, "questao_" ~ questao.id, marcadas.get(questao.id)) }}
+        </div>
+    {% endfor %}
+
+    <div class="acoes-fixas">
+        <div class="acoes">
+            <button type="submit" class="btn">Enviar simulado</button>
+            <a class="btn btn-secundario" href="/aluno/simulados">Voltar</a>
+        </div>
+    </div>
+</form>
+{% endblock %}

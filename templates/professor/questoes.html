@@ -11,7 +11,7 @@
     <a class="btn" href="/professor/questoes/nova-certo-errado">Nova certo ou errado</a>
 </div>
 
-<p>Total: {{ questoes|length }}</p>
+<p class="contador">Total: {{ questoes|length }}</p>
 {% if questoes %}
     <div class="tabela-rolagem">
         <table class="tabela">
@@ -24,18 +24,27 @@
                     <th>Ano</th>
                     <th>Gabarito</th>
                     <th>Enunciado</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
                 {% for questao in questoes %}
                     <tr>
-                        <td>{{ questao.id }}</td>
-                        <td>{{ questao.NOME_TIPO }}</td>
-                        <td>{{ questao.disciplina }}</td>
-                        <td>{{ questao.banca }}</td>
-                        <td>{{ questao.ano }}</td>
-                        <td>{{ questao.gabarito }}</td>
-                        <td>{{ questao.enunciado|truncate(80) }}</td>
+                        <td data-label="Nº" class="col-numero">{{ questao.id }}</td>
+                        <td data-label="Tipo">{{ questao.NOME_TIPO }}</td>
+                        <td data-label="Disciplina">{{ questao.disciplina }}</td>
+                        <td data-label="Banca">{{ questao.banca }}</td>
+                        <td data-label="Ano">{{ questao.ano }}</td>
+                        <td data-label="Gabarito"><strong>{{ questao.gabarito }}</strong></td>
+                        <td data-label="Enunciado" class="td-bloco">{{ questao.enunciado|truncate(80) }}</td>
+                        <td class="td-acoes">
+                            <div class="acoes-linha">
+                                <a class="btn btn-secundario btn-pequeno" href="/professor/questoes/{{ questao.id }}/editar">Editar</a>
+                                <form class="form-inline" method="post" action="/professor/questoes/{{ questao.id }}/excluir" onsubmit="return confirm('Excluir a questão nº {{ questao.id }}?');">
+                                    <button type="submit" class="btn btn-perigo btn-pequeno">Excluir</button>
+                                </form>
+                            </div>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>

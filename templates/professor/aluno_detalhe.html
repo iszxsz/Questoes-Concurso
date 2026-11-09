@@ -5,7 +5,7 @@
 
 {% block conteudo %}
 <h1>{{ desempenho.aluno.nome }}</h1>
-<p>{{ desempenho.aluno.email }}</p>
+<p class="subtitulo">{{ desempenho.aluno.email }}</p>
 
 {% include "resumo_desempenho.html" %}
 
@@ -25,11 +25,11 @@
             <tbody>
                 {% for resposta in respostas %}
                     <tr>
-                        <td>{{ resposta.data_formatada }}</td>
-                        <td>Nº {{ resposta.questao_id }}</td>
-                        <td>{{ resposta.resposta }}</td>
-                        <td>{{ resposta.questao().gabarito }}</td>
-                        <td>{{ tag_situacao(resposta) }}</td>
+                        <td data-label="Data">{{ resposta.data_formatada }}</td>
+                        <td data-label="Questão" class="col-numero">Nº {{ resposta.questao_id }}</td>
+                        <td data-label="Resposta">{{ resposta.resposta }}</td>
+                        <td data-label="Gabarito">{{ resposta.questao().gabarito }}</td>
+                        <td data-label="Situação">{{ tag_situacao(resposta) }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

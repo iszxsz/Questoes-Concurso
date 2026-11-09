@@ -1,17 +1,18 @@
-{% from "macros.html" import lista_vazia %}
+{% from "macros.html" import lista_vazia, barra_percentual %}
 
 <div class="grade">
     <div class="card">
         <div class="numero-destaque">{{ desempenho.geral.total }}</div>
-        questões respondidas
+        <span class="legenda">questões respondidas</span>
     </div>
     <div class="card">
         <div class="numero-destaque">{{ desempenho.geral.acertos }}</div>
-        acertos
+        <span class="legenda">acertos</span>
     </div>
     <div class="card">
         <div class="numero-destaque">{{ desempenho.geral.percentual }}%</div>
-        de aproveitamento
+        <span class="legenda">de aproveitamento</span>
+        <span class="barra" aria-hidden="true"><span style="width: {{ [[desempenho.geral.percentual, 0]|max, 100]|min }}%"></span></span>
     </div>
 </div>
 
@@ -31,10 +32,10 @@
             <tbody>
                 {% for disciplina in disciplinas %}
                     <tr>
-                        <td>{{ disciplina.nome }}</td>
-                        <td>{{ disciplina.total }}</td>
-                        <td>{{ disciplina.acertos }}</td>
-                        <td>{{ disciplina.percentual }}%</td>
+                        <td data-label="Disciplina"><strong>{{ disciplina.nome }}</strong></td>
+                        <td data-label="Respondidas">{{ disciplina.total }}</td>
+                        <td data-label="Acertos">{{ disciplina.acertos }}</td>
+                        <td data-label="Aproveitamento">{{ barra_percentual(disciplina.percentual) }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

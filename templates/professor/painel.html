@@ -4,12 +4,12 @@
 
 {% block conteudo %}
 <h1>Olá, {{ professor.primeiro_nome }}!</h1>
-<p>Matrícula: {{ professor.matricula }}</p>
+<p class="subtitulo">Matrícula {{ professor.matricula }}</p>
 
 <div class="grade">
     <div class="card">
         <div class="numero-destaque">{{ total_questoes }}</div>
-        questões cadastradas
+        <span class="legenda">questões cadastradas</span>
         <div class="acoes">
             <a class="btn btn-secundario" href="/professor/questoes">Ver questões</a>
         </div>
@@ -17,15 +17,24 @@
 
     <div class="card">
         <div class="numero-destaque">{{ total_alunos }}</div>
-        alunos
+        <span class="legenda">alunos</span>
         <div class="acoes">
             <a class="btn btn-secundario" href="/professor/alunos">Ver alunos</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Simulados</h2>
+        <p>Monte provas com as questões cadastradas e acompanhe as notas.</p>
+        <div class="acoes">
+            <a class="btn btn-secundario" href="/professor/simulados">Ver simulados</a>
         </div>
     </div>
 </div>
 
 <div class="card">
     <h2>Cadastrar questão</h2>
+    <p>Escolha o formato da nova questão.</p>
     <div class="acoes">
         <a class="btn" href="/professor/questoes/nova-multipla">Múltipla escolha</a>
         <a class="btn" href="/professor/questoes/nova-certo-errado">Certo ou errado</a>

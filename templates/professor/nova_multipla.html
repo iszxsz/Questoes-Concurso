@@ -1,12 +1,20 @@
 {% extends "base.html" %}
 
-{% block titulo %}Nova questão de múltipla escolha{% endblock %}
+{% if questao %}
+    {% set titulo_pagina = "Editar questão nº " ~ questao.id %}
+    {% set acao = "/professor/questoes/" ~ questao.id ~ "/editar" %}
+{% else %}
+    {% set titulo_pagina = "Nova questão de múltipla escolha" %}
+    {% set acao = "/professor/questoes/nova-multipla" %}
+{% endif %}
+
+{% block titulo %}{{ titulo_pagina }}{% endblock %}
 
 {% block conteudo %}
 <div class="card">
-    <h1>Nova questão de múltipla escolha</h1>
+    <h1>{{ titulo_pagina }}</h1>
 
-    <form method="post" action="/professor/questoes/nova-multipla">
+    <form method="post" action="{{ acao }}">
         <div class="form-grupo">
             <label class="rotulo" for="enunciado">Enunciado</label>
             <textarea id="enunciado" name="enunciado" required>{{ dados.get("enunciado", "") }}</textarea>
@@ -50,7 +58,7 @@
         </div>
 
         <div class="acoes">
-            <button type="submit" class="btn">Cadastrar</button>
+            <button type="submit" class="btn">{% if questao %}Salvar alterações{% else %}Cadastrar{% endif %}</button>
             <a class="btn btn-secundario" href="/professor/questoes">Cancelar</a>
         </div>
     </form>

@@ -4,19 +4,31 @@
 
 {% block conteudo %}
 <h1>Olá, {{ aluno.primeiro_nome }}!</h1>
-<p>O que você quer fazer hoje?</p>
+<p class="subtitulo">O que você quer estudar hoje?</p>
 
 <div class="grade">
     <div class="card">
         <h2>Questões</h2>
         <p>Resolva questões de concurso e veja na hora se acertou.</p>
-        <a class="btn" href="/aluno/questoes">Resolver questões</a>
+        <div class="acoes">
+            <a class="btn" href="/aluno/questoes">Resolver questões</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Simulados</h2>
+        <p>Encare uma prova inteira de uma vez e veja o resultado no final.</p>
+        <div class="acoes">
+            <a class="btn" href="/aluno/simulados">Ver simulados</a>
+        </div>
     </div>
 
     <div class="card">
         <h2>Meus resultados</h2>
-        <p>Veja seu aproveitamento geral, por disciplina e o histórico de respostas.</p>
-        <a class="btn" href="/aluno/resultados">Ver resultados</a>
+        <p>Seu aproveitamento geral, por disciplina e o histórico de respostas.</p>
+        <div class="acoes">
+            <a class="btn btn-secundario" href="/aluno/resultados">Ver resultados</a>
+        </div>
     </div>
 </div>
 {% endblock %}

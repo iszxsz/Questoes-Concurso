@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "macros.html" import lista_vazia %}
+
+{% block titulo %}Simulados{% endblock %}
+
+{% block conteudo %}
+<h1>Simulados</h1>
+
+<div class="acoes">
+    <a class="btn" href="/professor/simulados/novo">Novo simulado</a>
+</div>
+
+<p class="contador">Total: {{ simulados|length }}</p>
+{% if simulados %}
+    <div class="tabela-rolagem">
+        <table class="tabela">
+            <thead>
+                <tr>
+                    <th>Nº</th>
+                    <th>Título</th>
+                    <th>Questões</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for simulado in simulados %}
+                    <tr>
+                        <td data-label="Nº" class="col-numero">{{ simulado.id }}</td>
+                        <td data-label="Título"><strong>{{ simulado.titulo }}</strong></td>
+                        <td data-label="Questões">{{ simulado|length }}</td>
+                        <td class="td-acoes"><a class="btn btn-secundario btn-pequeno" href="/professor/simulados/{{ simulado.id }}">Ver resultados</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    {{ lista_vazia("Nenhum simulado montado ainda.") }}
+{% endif %}
+{% endblock %}

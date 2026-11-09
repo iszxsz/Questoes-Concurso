@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% from "macros.html" import lista_vazia %}
+
+{% block titulo %}Novo simulado{% endblock %}
+
+{% block conteudo %}
+<div class="card">
+    <h1>Novo simulado</h1>
+
+    {% if questoes %}
+        <form method="post" action="/professor/simulados/novo">
+            <div class="form-grupo">
+                <label class="rotulo" for="titulo">Título</label>
+                <input type="text" id="titulo" name="titulo" value="{{ titulo }}" required>
+            </div>
+
+            <p class="rotulo">Questões</p>
+            <p class="ajuda">Marque pelo menos 2. Elas aparecem para o aluno nesta ordem.</p>
+            <div class="alternativas">
+                {% for questao in questoes %}
+                    <label class="alternativa">
+                        <input type="checkbox" name="questoes" value="{{ questao.id }}" {% if questao.id|string in escolhidas %}checked{% endif %}>
+                        <span class="letra" aria-hidden="true"></span>
+                        <span class="alternativa-texto">
+                            <strong>Nº {{ questao.id }}</strong> · {{ questao.disciplina }} · {{ questao.banca }} · {{ questao.NOME_TIPO }}<br>
+                            {{ questao.enunciado|truncate(120) }}
+                        </span>
+                    </label>
+                {% endfor %}
+            </div>
+
+            <div class="acoes">
+                <button type="submit" class="btn">Criar simulado</button>
+                <a class="btn btn-secundario" href="/professor/simulados">Cancelar</a>
+            </div>
+        </form>
+    {% else %}
+        {{ lista_vazia("Cadastre questões antes de montar um simulado.") }}
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% from "macros.html" import cabecalho_questao, lista_vazia, barra_percentual %}
+
+{% block titulo %}{{ simulado.titulo }}{% endblock %}
+
+{% block conteudo %}
+<h1>{{ simulado.titulo }}</h1>
+<p class="subtitulo">{{ simulado|length }} questões</p>
+
+<h2>Resultados</h2>
+{% if resultados %}
+    <div class="tabela-rolagem">
+        <table class="tabela">
+            <thead>
+                <tr>
+                    <th>Aluno</th>
+                    <th>Acertos</th>
+                    <th>Erros</th>
+                    <th>Aproveitamento</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resultado in resultados %}
+                    <tr>
+                        <td data-label="Aluno"><a href="/professor/alunos/{{ resultado.aluno.id }}"><strong>{{ resultado.aluno.nome }}</strong></a></td>
+                        <td data-label="Acertos">{{ resultado.geral.acertos }} de {{ resultado.geral.total }}</td>
+                        <td data-label="Erros">{{ resultado.geral.erros }}</td>
+                        <td data-label="Aproveitamento">{{ barra_percentual(resultado.geral.percentual) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    {{ lista_vazia("Nenhum aluno fez este simulado ainda.") }}
+{% endif %}
+
+<h2>Questões</h2>
+{% for questao in simulado.questoes %}
+    <div class="card">
+        {{ cabecalho_questao(questao) }}
+        <p>{{ questao.enunciado|truncate(180) }}</p>
+        <p>Gabarito: <strong>{{ questao.gabarito }}) {{ questao.texto_da_opcao(questao.gabarito) }}</strong></p>
+    </div>
+{% else %}
+    {{ lista_vazia("As questões deste simulado foram excluídas.") }}
+{% endfor %}
+
+<div class="acoes">
+    <a class="btn btn-secundario" href="/professor/simulados">Voltar para simulados</a>
+</div>
+{% endblock %}
