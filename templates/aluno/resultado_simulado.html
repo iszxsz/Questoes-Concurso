@@ -15,15 +15,33 @@
         <h3 class="numero-questao"><span>{{ loop.index }}</span> Questão</h3>
         {{ cabecalho_questao(questao) }}
 
-        {% if resposta %}
-            <div class="veredito">
-                {{ tag_situacao(resposta) }}
-                <p>Você marcou <strong>{{ resposta.resposta }}) {{ questao.texto_da_opcao(resposta.resposta) }}</strong>.</p>
-            </div>
-        {% endif %}
+        {% if questao.CORRECAO_AUTOMATICA %}
+            {% if resposta %}
+                <div class="veredito">
+                    {{ tag_situacao(resposta) }}
+                    <p>Você marcou <strong>{{ resposta.resposta }}) {{ questao.texto_da_opcao(resposta.resposta) }}</strong>.</p>
+                </div>
+            {% endif %}
 
-        {{ texto_longo(questao.enunciado) }}
-        {{ opcoes_corrigidas(questao, resposta) }}
+            {{ texto_longo(questao.enunciado) }}
+            {{ opcoes_corrigidas(questao, resposta) }}
+        {% else %}
+            {% if resposta %}
+                <div class="veredito">
+                    {{ tag_situacao(resposta) }}
+                    <p>
+                        {% if resposta.corrigida %}
+                            Nota <strong>{{ resposta.nota }}</strong>.
+                        {% else %}
+                            Esperando a correção do professor.
+                        {% endif %}
+                        <a href="/aluno/redacoes/{{ resposta.id }}">Ver redação</a>
+                    </p>
+                </div>
+            {% endif %}
+
+            {{ texto_longo(questao.enunciado) }}
+        {% endif %}
     </div>
 {% endfor %}
 

@@ -7,10 +7,14 @@ from src.models.aluno import Aluno
 from src.models.professor import Professor
 from src.models.questao_certo_errado import QuestaoCertoErrado
 from src.models.questao_multipla import QuestaoMultipla
+from src.models.redacao import Redacao
 from src.models.usuario import Usuario
 
 CAMINHO_BANCO_TESTE = "teste.db"
 SENHA_TESTE = "123456"
+
+# uns 300 e poucos caracteres, passa do mínimo da redação
+TEXTO_REDACAO = "A leitura forma cidadãos mais críticos e participativos. " * 5 + "Fim do texto do aluno."
 
 
 def deve_recusar(funcao, *argumentos):
@@ -75,3 +79,23 @@ def criar_cenario():
     certo_errado.salvar()
 
     return aluno, multipla, certo_errado
+
+
+def criar_redacao(professor_id):
+    """Cria e salva uma redação no estilo ENEM.
+
+    Args:
+        professor_id (int): id do professor autor.
+
+    Returns:
+        Redacao: a redação já com id.
+    """
+    redacao = Redacao(
+        "Desafios para a formação de leitores no Brasil",
+        "Redação",
+        "INEP",
+        2023,
+        professor_id,
+    )
+    redacao.salvar()
+    return redacao

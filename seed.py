@@ -111,10 +111,57 @@ QUESTOES_CERTO_ERRADO = [
 ]
 
 
-SIMULADO = {
-    "titulo": "Simulado Cebraspe: Português e Direito",
-    "questoes": [2, 5, 7, 8],
+REDACOES = [
+    {
+        "id": 9,
+        "disciplina": "Redação",
+        "banca": "INEP",
+        "ano": 2023,
+        "enunciado": (
+            "Desafios para o enfrentamento da invisibilidade do trabalho de cuidado "
+            "realizado pela mulher no Brasil.\n\n"
+            "Escreva um texto dissertativo-argumentativo em modalidade escrita formal "
+            "da língua portuguesa, com proposta de intervenção que respeite os direitos humanos."
+        ),
+    },
+    {
+        "id": 10,
+        "disciplina": "Redação",
+        "banca": "INEP",
+        "ano": 2022,
+        "enunciado": (
+            "Desafios para a valorização de comunidades e povos tradicionais no Brasil.\n\n"
+            "Escreva um texto dissertativo-argumentativo em modalidade escrita formal "
+            "da língua portuguesa, com proposta de intervenção que respeite os direitos humanos."
+        ),
+    },
+]
+
+# redação do aluno que fica esperando correção, pra tela do professor não começar vazia
+REDACAO_PENDENTE = {
+    "questao_id": 9,
+    "texto": (
+        "No Brasil, o trabalho de cuidado com filhos, idosos e com a casa ainda recai "
+        "quase todo sobre as mulheres e raramente é reconhecido como trabalho. Isso "
+        "acontece, em primeiro lugar, por uma herança cultural que trata essas tarefas "
+        "como obrigação natural feminina. Além disso, a falta de creches e de políticas "
+        "de apoio faz com que muitas mulheres deixem o mercado formal.\n\n"
+        "Portanto, cabe ao Ministério da Educação incluir o tema nas escolas e ao poder "
+        "público municipal ampliar as vagas em creches, para dividir essa "
+        "responsabilidade de forma mais justa."
+    ),
 }
+
+SIMULADOS = [
+    {
+        "titulo": "Simulado Cebraspe: Português e Direito",
+        "questoes": [2, 5, 7, 8],
+    },
+    {
+        "titulo": "Simulado ENEM: Português e redação",
+        "questoes": [1, 2, 10],
+    },
+]
 
 
 def apagar_banco():
@@ -196,24 +243,61 @@ def inserir_questoes_certo_errado(conexao, professor_id):
         )
 
 
-def inserir_simulado(conexao, professor_id):
-    """Insere o simulado de exemplo com as questões na ordem da lista.
+def inserir_redacoes(conexao, professor_id):
+    """Insere as propostas de redação de exemplo, sem alternativas nem gabarito.
 
     Args:
         conexao (sqlite3.Connection): conexão aberta com o banco.
-        professor_id (int): id do professor que fica como autor do simulado.
+        professor_id (int): id do professor que fica como autor das redações.
     """
-    cursor = conexao.execute(
-        "INSERT INTO simulado (titulo, professor_id) VALUES (?, ?)",
-        (SIMULADO["titulo"], professor_id),
-    )
-    simulado_id = cursor.lastrowid
-
-    for posicao, questao_id in enumerate(SIMULADO["questoes"], start=1):
+    for questao in REDACOES:
         conexao.execute(
-            "INSERT INTO simulado_questao (simulado_id, questao_id, posicao) VALUES (?, ?, ?)",
-            (simulado_id, questao_id, posicao),
+            "INSERT INTO questao (id, tipo, enunciado, disciplina, banca, ano, professor_id) "
+            "VALUES (?, 'redacao', ?, ?, ?, ?, ?)",
+            (
+                questao["id"],
+                questao["enunciado"],
+                questao["disciplina"],
+                questao["banca"],
+                questao["ano"],
+                professor_id,
+            ),
         )
+
+
+def inserir_redacao_pendente(conexao, aluno_id):
+    """Insere uma redação do aluno esperando correção.
+
+    Args:
+        conexao (sqlite3.Connection): conexão aberta com o banco.
+        aluno_id (int): id do aluno que enviou a redação.
+    """
+    conexao.execute(
+        "INSERT INTO resposta (aluno_id, questao_id, resposta, situacao) "
+        "VALUES (?, ?, ?, 'pendente')",
+        (aluno_id, REDACAO_PENDENTE["questao_id"], REDACAO_PENDENTE["texto"]),
+    )
+
+
+def inserir_simulados(conexao, professor_id):
+    """Insere os simulados de exemplo com as questões na ordem de cada lista.
+
+    Args:
+        conexao (sqlite3.Connection): conexão aberta com o banco.
+        professor_id (int): id do professor que fica como autor dos simulados.
+    """
+    for simulado in SIMULADOS:
+        cursor = conexao.execute(
+            "INSERT INTO simulado (titulo, professor_id) VALUES (?, ?)",
+            (simulado["titulo"], professor_id),
+        )
+        simulado_id = cursor.lastrowid
+
+        for posicao, questao_id in enumerate(simulado["questoes"], start=1):
+            conexao.execute(
+                "INSERT INTO simulado_questao (simulado_id, questao_id, posicao) VALUES (?, ?, ?)",
+                (simulado_id, questao_id, posicao),
+            )
 
 
 def main():
@@ -224,11 +308,13 @@ def main():
     conexao = database.conectar()
 
     professor_id = inserir_usuario(conexao, PROFESSOR)
-    inserir_usuario(conexao, ALUNO)
+    aluno_id = inserir_usuario(conexao, ALUNO)
 
     inserir_questoes_multipla(conexao, professor_id)
     inserir_questoes_certo_errado(conexao, professor_id)
-    inserir_simulado(conexao, professor_id)
+    inserir_redacoes(conexao, professor_id)
+    inserir_simulados(conexao, professor_id)
+    inserir_redacao_pendente(conexao, aluno_id)
 
     conexao.commit()
     conexao.close()

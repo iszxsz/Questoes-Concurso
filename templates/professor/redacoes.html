@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% from "macros.html" import lista_vazia %}
+
+{% block titulo %}Redações para corrigir{% endblock %}
+
+{% block conteudo %}
+<h1>Redações para corrigir</h1>
+<p class="subtitulo">Da mais antiga para a mais nova.</p>
+
+<p class="contador">Pendentes: {{ pendentes|length }}</p>
+{% if pendentes %}
+    <div class="tabela-rolagem">
+        <table class="tabela">
+            <thead>
+                <tr>
+                    <th>Enviada em</th>
+                    <th>Aluno</th>
+                    <th>Tema</th>
+                    <th>Origem</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resposta in pendentes %}
+                    <tr>
+                        <td data-label="Enviada em">{{ resposta.data_formatada }}</td>
+                        <td data-label="Aluno"><strong>{{ resposta.aluno().nome }}</strong></td>
+                        <td data-label="Tema" class="td-bloco">{{ resposta.questao().enunciado|truncate(70) }}</td>
+                        <td data-label="Origem">{% if resposta.simulado_id %}Simulado{% else %}Avulsa{% endif %}</td>
+                        <td class="td-acoes">
+                            <a class="btn btn-pequeno" href="/professor/redacoes/{{ resposta.id }}">Corrigir</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    {{ lista_vazia("Nenhuma redação esperando correção.") }}
+{% endif %}
+{% endblock %}

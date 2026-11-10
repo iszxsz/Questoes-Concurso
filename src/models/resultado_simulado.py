@@ -14,8 +14,8 @@ class ResultadoSimulado(Desempenho):
     def __init__(self, aluno, simulado):
         """Começa o desempenho do aluno e guarda o simulado."""
         super().__init__(aluno)
-        self.simulado = simulado
-        self.respostas = []
+        self.__simulado = simulado
+        self.__respostas = []
 
     def __str__(self):
         """Resumo com o aluno, o simulado e o aproveitamento."""
@@ -32,20 +32,36 @@ class ResultadoSimulado(Desempenho):
     def registrar(self, resposta):
         """Soma a resposta ao desempenho e guarda na lista de respostas."""
         super().registrar(resposta)
-        self.respostas.append(resposta)
+        self.__respostas.append(resposta)
+
+    @property
+    def simulado(self):
+        """Simulado deste resultado."""
+        return self.__simulado
+
+    @property
+    def respostas(self):
+        """Cópia da lista de respostas, pra quem usa não mexer na original."""
+        return list(self.__respostas)
 
     @property
     def feito(self):
         """True se o aluno já fez o simulado."""
-        return self.geral.total > 0
+        # não dá pra usar geral.total: num simulado só de redação ele fica 0
+        return len(self.__respostas) > 0
 
     def itens(self):
         """Pares (questão, resposta) na ordem do simulado; resposta None se faltar."""
-        resposta_da_questao = {}
-        for resposta in self.respostas:
-            resposta_da_questao[resposta.questao_id] = resposta
+        resposta_da_questao = self.__respostas_por_questao()
 
         itens = []
-        for questao in self.simulado.questoes:
+        for questao in self.__simulado.questoes:
             itens.append((questao, resposta_da_questao.get(questao.id)))
         return itens
+
+    def __respostas_por_questao(self):
+        """Dicionário com a resposta dada em cada questão, pelo id da questão."""
+        respostas = {}
+        for resposta in self.__respostas:
+            respostas[resposta.questao_id] = resposta
+        return respostas

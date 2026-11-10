@@ -1,9 +1,9 @@
 """Questão de certo ou errado."""
 
-from src.models.questao import Questao
+from src.models.questao_objetiva import QuestaoObjetiva
 
 
-class QuestaoCertoErrado(Questao):
+class QuestaoCertoErrado(QuestaoObjetiva):
     """Afirmação que o aluno julga como certa ou errada, no estilo Cebraspe."""
 
     TIPO = "certo_errado"
@@ -29,4 +29,17 @@ class QuestaoCertoErrado(Questao):
             professor_id,
             dados.get("gabarito", ""),
             id,
+        )
+
+    @classmethod
+    def _montar_de_linha(cls, linha):
+        """Cria a questão a partir de uma linha da tabela questao."""
+        return cls(
+            linha["enunciado"],
+            linha["disciplina"],
+            linha["banca"],
+            linha["ano"],
+            linha["professor_id"],
+            linha["gabarito"],
+            linha["id"],
         )

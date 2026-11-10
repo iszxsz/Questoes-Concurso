@@ -1,16 +1,25 @@
 """Desempenho de um aluno."""
 
 from src.models.aproveitamento import Aproveitamento
+from src.models.notas_redacao import NotasRedacao
 from src.models.resposta import Resposta
 
 
 class Desempenho:
-    """Resume as respostas de um aluno: aproveitamento geral e por disciplina."""
+    """Resume as respostas de um aluno: aproveitamento geral, por disciplina
+    e média das redações.
+
+    Tudo fica em atributos internos. De fora só dá para ler pelas
+    propriedades e somar respostas com registrar().
+    """
 
     def __init__(self, aluno):
-        """Guarda o aluno, o aproveitamento geral e o dicionário por disciplina."""
-        self.aluno = aluno
-        self.geral = Aproveitamento("Geral")
+        """Guarda o aluno, o aproveitamento geral, o dicionário por disciplina
+        e as notas de redação."""
+        # protegidos (um _ só) porque ResultadoSimulado herda e usa
+        self._aluno = aluno
+        self._geral = Aproveitamento("Geral")
+        self._redacoes = NotasRedacao()
         self._disciplinas = {}
 
     def __str__(self):
@@ -25,14 +34,45 @@ class Desempenho:
             desempenho.registrar(resposta)
         return desempenho
 
+    @property
+    def aluno(self):
+        """Aluno dono do desempenho."""
+        return self._aluno
+
+    @property
+    def geral(self):
+        """Aproveitamento de todas as questões objetivas."""
+        return self._geral
+
+    @property
+    def redacoes(self):
+        """Notas das redações (média e pendentes)."""
+        return self._redacoes
+
     def registrar(self, resposta):
-        """Soma a resposta ao geral e ao aproveitamento da disciplina da questão."""
+        """Soma a resposta no lugar certo, conforme a situação dela.
+
+        Redação não entra no percentual de acertos: corrigida soma na média
+        das redações e pendente só é contada.
+        """
+        if resposta.pendente:
+            self._redacoes.registrar_pendente()
+        elif resposta.corrigida:
+            self._redacoes.registrar(resposta.nota)
+        else:
+            self.__registrar_objetiva(resposta)
+
+    def __registrar_objetiva(self, resposta):
+        """Soma a resposta objetiva no geral e na disciplina da questão."""
         disciplina = resposta.questao().disciplina
+        self._geral.registrar(resposta.acertou)
+        self.__aproveitamento_da_disciplina(disciplina).registrar(resposta.acertou)
+
+    def __aproveitamento_da_disciplina(self, disciplina):
+        """Aproveitamento da disciplina, criado na primeira vez que aparece."""
         if disciplina not in self._disciplinas:
             self._disciplinas[disciplina] = Aproveitamento(disciplina)
-
-        self.geral.registrar(resposta.acertou)
-        self._disciplinas[disciplina].registrar(resposta.acertou)
+        return self._disciplinas[disciplina]
 
     def por_disciplina(self):
         """Lista dos aproveitamentos por disciplina, em ordem alfabética."""

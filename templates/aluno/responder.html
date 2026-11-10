@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "macros.html" import cabecalho_questao, texto_longo, opcoes_resposta %}
+{% from "macros.html" import cabecalho_questao, texto_longo, campo_resposta %}
 
 {% block titulo %}Questão {{ questao.id }}{% endblock %}
 
@@ -9,7 +9,7 @@
     {{ texto_longo(questao.enunciado) }}
 
     <form method="post" action="/aluno/questoes/{{ questao.id }}">
-        {{ opcoes_resposta(questao) }}
+        {{ campo_resposta(questao) }}
 
         <div class="acoes">
             <button type="submit" class="btn">Responder</button>

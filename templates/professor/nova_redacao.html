@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% if questao %}
+    {% set titulo_pagina = "Editar redação nº " ~ questao.id %}
+    {% set acao = "/professor/questoes/" ~ questao.id ~ "/editar" %}
+{% else %}
+    {% set titulo_pagina = "Nova proposta de redação" %}
+    {% set acao = "/professor/questoes/nova-redacao" %}
+{% endif %}
+
+{% block titulo %}{{ titulo_pagina }}{% endblock %}
+
+{% block conteudo %}
+<div class="card">
+    <h1>{{ titulo_pagina }}</h1>
+
+    <form method="post" action="{{ acao }}">
+        <div class="form-grupo">
+            <label class="rotulo" for="enunciado">Tema e textos motivadores</label>
+            <textarea id="enunciado" name="enunciado" required>{{ dados.get("enunciado", "") }}</textarea>
+            <p class="ajuda">O aluno escreve um texto dissertativo-argumentativo sobre este tema.</p>
+        </div>
+
+        <div class="filtros">
+            <div class="form-grupo">
+                <label class="rotulo" for="disciplina">Disciplina</label>
+                <input type="text" id="disciplina" name="disciplina" value="{{ dados.get('disciplina', 'Redação') }}" required>
+            </div>
+
+            <div class="form-grupo">
+                <label class="rotulo" for="banca">Banca</label>
+                <input type="text" id="banca" name="banca" value="{{ dados.get('banca', '') }}" required>
+            </div>
+
+            <div class="form-grupo">
+                <label class="rotulo" for="ano">Ano</label>
+                <input type="number" id="ano" name="ano" value="{{ dados.get('ano', '') }}" min="1990" max="2100" required>
+            </div>
+        </div>
+
+        <p class="rotulo">Correção</p>
+        <p class="ajuda">Feita por você depois do envio, nas cinco competências do ENEM (0 a 200 cada):</p>
+        <ol class="ajuda">
+            {% for competencia in competencias %}
+                <li>{{ competencia }}</li>
+            {% endfor %}
+        </ol>
+
+        <div class="acoes">
+            <button type="submit" class="btn">{% if questao %}Salvar alterações{% else %}Cadastrar{% endif %}</button>
+            <a class="btn btn-secundario" href="/professor/questoes">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

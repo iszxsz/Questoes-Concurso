@@ -18,7 +18,7 @@
                     <th>Data</th>
                     <th>Questão</th>
                     <th>Resposta</th>
-                    <th>Gabarito</th>
+                    <th>Gabarito ou nota</th>
                     <th>Situação</th>
                 </tr>
             </thead>
@@ -27,8 +27,13 @@
                     <tr>
                         <td data-label="Data">{{ resposta.data_formatada }}</td>
                         <td data-label="Questão" class="col-numero">Nº {{ resposta.questao_id }}</td>
-                        <td data-label="Resposta">{{ resposta.resposta }}</td>
-                        <td data-label="Gabarito">{{ resposta.questao().gabarito }}</td>
+                        {% if resposta.pendente or resposta.corrigida %}
+                            <td data-label="Resposta"><a href="/professor/redacoes/{{ resposta.id }}">{% if resposta.pendente %}Corrigir{% else %}Ver{% endif %} redação</a></td>
+                            <td data-label="Gabarito ou nota">{% if resposta.corrigida %}<strong>{{ resposta.nota }}</strong>{% else %}-{% endif %}</td>
+                        {% else %}
+                            <td data-label="Resposta">{{ resposta.resposta }}</td>
+                            <td data-label="Gabarito ou nota">{{ resposta.questao().gabarito }}</td>
+                        {% endif %}
                         <td data-label="Situação">{{ tag_situacao(resposta) }}</td>
                     </tr>
                 {% endfor %}

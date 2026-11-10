@@ -16,14 +16,14 @@ CREATE TABLE IF NOT EXISTS usuario (
 
 CREATE TABLE IF NOT EXISTS questao (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    tipo TEXT NOT NULL CHECK (tipo IN ('multipla', 'certo_errado')),
+    tipo TEXT NOT NULL CHECK (tipo IN ('multipla', 'certo_errado', 'redacao')),
     enunciado TEXT NOT NULL,
     disciplina TEXT NOT NULL,
     banca TEXT NOT NULL,
     ano INTEGER NOT NULL,
     professor_id INTEGER NOT NULL REFERENCES usuario (id),
     alternativas TEXT,
-    gabarito TEXT NOT NULL
+    gabarito TEXT
 );
 
 CREATE TABLE IF NOT EXISTS simulado (
@@ -44,9 +44,12 @@ CREATE TABLE IF NOT EXISTS resposta (
     aluno_id INTEGER NOT NULL REFERENCES usuario (id),
     questao_id INTEGER NOT NULL REFERENCES questao (id),
     resposta TEXT NOT NULL,
-    situacao TEXT NOT NULL CHECK (situacao IN ('correta', 'errada')),
+    situacao TEXT NOT NULL CHECK (situacao IN ('correta', 'errada', 'pendente', 'corrigida')),
     respondida_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    simulado_id INTEGER REFERENCES simulado (id)
+    simulado_id INTEGER REFERENCES simulado (id),
+    competencias TEXT,
+    comentario TEXT,
+    corrigida_em TEXT
 );
 """
 

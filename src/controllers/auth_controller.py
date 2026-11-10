@@ -12,14 +12,14 @@ class AuthController(Controller):
 
     TIPO_USUARIO = None
 
-    def registrar_rotas(self):
+    def _registrar_rotas(self):
         """Registra as rotas de entrada e saída."""
-        self.adicionar_rota("/", "inicio", self.inicio)
-        self.adicionar_rota("/login", "login", self.login, ("GET", "POST"))
-        self.adicionar_rota("/cadastro", "cadastro", self.cadastro, ("GET", "POST"))
-        self.adicionar_rota("/logout", "logout", self.logout)
+        self._adicionar_rota("/", "inicio", self.inicio)
+        self._adicionar_rota("/login", "login", self.login, ("GET", "POST"))
+        self._adicionar_rota("/cadastro", "cadastro", self.cadastro, ("GET", "POST"))
+        self._adicionar_rota("/logout", "logout", self.logout)
 
-    def iniciar_sessao(self, usuario):
+    def __iniciar_sessao(self, usuario):
         """Limpa a sessão e guarda os dados do usuário que entrou."""
         session.clear()
         session["usuario_id"] = usuario.id
@@ -29,8 +29,8 @@ class AuthController(Controller):
     def inicio(self):
         """Manda para o login ou para o painel do perfil do usuário."""
         if self.usuario is None:
-            return self.redirecionar("/login")
-        return self.redirecionar("/" + self.usuario.TIPO)
+            return self._redirecionar("/login")
+        return self._redirecionar("/" + self.usuario.TIPO)
 
     def login(self):
         """Mostra o formulário de login e autentica o usuário."""
@@ -42,12 +42,12 @@ class AuthController(Controller):
 
             usuario = Usuario.autenticar(email, senha)
             if usuario is None:
-                self.avisar_erro("E-mail ou senha incorretos.")
+                self._avisar_erro("E-mail ou senha incorretos.")
             else:
-                self.iniciar_sessao(usuario)
-                return self.redirecionar("/")
+                self.__iniciar_sessao(usuario)
+                return self._redirecionar("/")
 
-        return self.renderizar("login.html", email=email)
+        return self._renderizar("login.html", email=email)
 
     def cadastro(self):
         """Mostra o formulário de cadastro e cria a conta do aluno."""
@@ -63,14 +63,14 @@ class AuthController(Controller):
             try:
                 aluno = Aluno.cadastrar(nome, email, senha, confirmar_senha)
             except ValueError as erro:
-                self.avisar_erro(str(erro))
+                self._avisar_erro(str(erro))
             else:
-                self.iniciar_sessao(aluno)
-                return self.redirecionar("/", "Conta criada com sucesso.")
+                self.__iniciar_sessao(aluno)
+                return self._redirecionar("/", "Conta criada com sucesso.")
 
-        return self.renderizar("cadastro.html", nome=nome, email=email)
+        return self._renderizar("cadastro.html", nome=nome, email=email)
 
     def logout(self):
         """Limpa a sessão e volta para o login."""
         session.clear()
-        return self.redirecionar("/login", "Você saiu do sistema.")
+        return self._redirecionar("/login", "Você saiu do sistema.")

@@ -24,6 +24,14 @@
     </div>
 
     <div class="card">
+        <div class="numero-destaque">{{ total_pendentes }}</div>
+        <span class="legenda">{{ "redação para corrigir" if total_pendentes == 1 else "redações para corrigir" }}</span>
+        <div class="acoes">
+            <a class="btn btn-secundario" href="/professor/redacoes">Corrigir redações</a>
+        </div>
+    </div>
+
+    <div class="card">
         <h2>Simulados</h2>
         <p>Monte provas com as questões cadastradas e acompanhe as notas.</p>
         <div class="acoes">
@@ -38,6 +46,7 @@
     <div class="acoes">
         <a class="btn" href="/professor/questoes/nova-multipla">Múltipla escolha</a>
         <a class="btn" href="/professor/questoes/nova-certo-errado">Certo ou errado</a>
+        <a class="btn" href="/professor/questoes/nova-redacao">Redação</a>
     </div>
 </div>
 {% endblock %}

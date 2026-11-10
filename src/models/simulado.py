@@ -102,17 +102,26 @@ class Simulado:
         if self.ja_feito_por(aluno):
             raise ValueError("Você já fez este simulado.")
 
-        respostas_limpas = {}
-        for numero, questao in enumerate(self.questoes, start=1):
-            try:
-                respostas_limpas[questao.id] = questao.validar_resposta(respostas.get(questao.id))
-            except ValueError:
-                raise ValueError(f"Responda a questão {numero} antes de enviar.")
-
+        # valida tudo antes de salvar a primeira, pra não ficar simulado pela metade
+        respostas_limpas = self.__validar_respostas(respostas)
         for questao in self.questoes:
             Resposta.registrar(aluno.id, questao, respostas_limpas[questao.id], self.id)
 
         return self.resultado_de(aluno)
+
+    def __validar_respostas(self, respostas):
+        """Devolve as respostas limpas pelo id da questão, ou lança ValueError
+        dizendo o número da primeira questão com problema."""
+        respostas_limpas = {}
+        for numero, questao in enumerate(self.questoes, start=1):
+            enviada = str(respostas.get(questao.id) or "").strip()
+            if enviada == "":
+                raise ValueError(f"Responda a questão {numero} antes de enviar.")
+            try:
+                respostas_limpas[questao.id] = questao.validar_resposta(enviada)
+            except ValueError as erro:
+                raise ValueError(f"Questão {numero}: {erro}")
+        return respostas_limpas
 
     @staticmethod
     def buscar_questoes(simulado_id):
