@@ -40,7 +40,11 @@
     <div class="card">
         {{ cabecalho_questao(questao) }}
         <p>{{ questao.enunciado|truncate(180) }}</p>
-        <p>Gabarito: <strong>{{ questao.gabarito }}) {{ questao.texto_da_opcao(questao.gabarito) }}</strong></p>
+        {% if questao.CORRECAO_AUTOMATICA %}
+            <p>Gabarito: <strong>{{ questao.gabarito }}) {{ questao.texto_da_opcao(questao.gabarito) }}</strong></p>
+        {% else %}
+            <p>Redação: corrigida pelo professor em <a href="/professor/redacoes">Redações</a>.</p>
+        {% endif %}
     </div>
 {% else %}
     {{ lista_vazia("As questões deste simulado foram excluídas.") }}

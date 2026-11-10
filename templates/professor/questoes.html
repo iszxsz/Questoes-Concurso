@@ -9,6 +9,7 @@
 <div class="acoes">
     <a class="btn" href="/professor/questoes/nova-multipla">Nova múltipla escolha</a>
     <a class="btn" href="/professor/questoes/nova-certo-errado">Nova certo ou errado</a>
+    <a class="btn" href="/professor/questoes/nova-redacao">Nova redação</a>
 </div>
 
 <p class="contador">Total: {{ questoes|length }}</p>
@@ -35,7 +36,7 @@
                         <td data-label="Disciplina">{{ questao.disciplina }}</td>
                         <td data-label="Banca">{{ questao.banca }}</td>
                         <td data-label="Ano">{{ questao.ano }}</td>
-                        <td data-label="Gabarito"><strong>{{ questao.gabarito }}</strong></td>
+                        <td data-label="Gabarito">{% if questao.CORRECAO_AUTOMATICA %}<strong>{{ questao.gabarito }}</strong>{% else %}-{% endif %}</td>
                         <td data-label="Enunciado" class="td-bloco">{{ questao.enunciado|truncate(80) }}</td>
                         <td class="td-acoes">
                             <div class="acoes-linha">

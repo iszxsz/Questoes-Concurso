@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "macros.html" import cabecalho_questao, texto_longo, opcoes_resposta %}
+{% from "macros.html" import cabecalho_questao, texto_longo, campo_resposta %}
 
 {% block titulo %}{{ simulado.titulo }}{% endblock %}
 
@@ -13,7 +13,7 @@
             <h2 class="numero-questao"><span>{{ loop.index }}</span> de {{ simulado|length }}</h2>
             {{ cabecalho_questao(questao) }}
             {{ texto_longo(questao.enunciado) }}
-            {{ opcoes_resposta(questao, "questao_" ~ questao.id, marcadas.get(questao.id)) }}
+            {{ campo_resposta(questao, "questao_" ~ questao.id, marcadas.get(questao.id)) }}
         </div>
     {% endfor %}
 

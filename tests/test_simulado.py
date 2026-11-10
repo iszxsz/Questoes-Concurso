@@ -1,11 +1,13 @@
 """Testes de simulado e do resultado do aluno no simulado."""
 
+from src.models.correcao_redacao import CorrecaoRedacao
 from src.models.desempenho import Desempenho
 from src.models.questao_multipla import QuestaoMultipla
+from src.models.redacao import Redacao
 from src.models.resposta import Resposta
 from src.models.resultado_simulado import ResultadoSimulado
 from src.models.simulado import Simulado
-from tests.apoio import criar_cenario, deve_recusar
+from tests.apoio import TEXTO_REDACAO, criar_cenario, criar_redacao, deve_recusar
 
 
 def montar_simulado():
@@ -120,6 +122,38 @@ def testar_resultados_dos_alunos():
     assert resultados[0].geral.percentual == 100.0
 
 
+def testar_simulado_com_redacao():
+    aluno, multipla, certo_errado = criar_cenario()
+    redacao = criar_redacao(multipla.professor_id)
+    simulado = Simulado.montar("Com redação", multipla.professor_id, [multipla.id, redacao.id])
+    assert isinstance(simulado.questoes[1], Redacao)
+
+    mensagem = deve_recusar(simulado.responder, aluno, {multipla.id: "B", redacao.id: "curta"})
+    assert mensagem == "Questão 2: A redação deve ter pelo menos 300 caracteres."
+    assert not simulado.ja_feito_por(aluno)
+
+    resultado = simulado.responder(aluno, {multipla.id: "B", redacao.id: TEXTO_REDACAO})
+    assert resultado.geral.total == 1
+    assert resultado.redacoes.pendentes == 1
+    assert len(Resposta.listar_pendentes()) == 1
+
+
+def testar_simulado_so_de_redacao_conta_como_feito():
+    aluno, multipla, certo_errado = criar_cenario()
+    primeira = criar_redacao(multipla.professor_id)
+    segunda = criar_redacao(multipla.professor_id)
+    simulado = Simulado.montar("Só redação", multipla.professor_id, [primeira.id, segunda.id])
+
+    resultado = simulado.responder(aluno, {primeira.id: TEXTO_REDACAO, segunda.id: TEXTO_REDACAO})
+    assert resultado.feito
+    assert resultado.geral.total == 0
+    assert len(simulado.resultados()) == 1
+
+    respostas = Resposta.listar_por_simulado(simulado.id, aluno.id)
+    respostas[0].registrar_correcao(CorrecaoRedacao([200, 200, 200, 200, 200], "Excelente."))
+    assert simulado.resultado_de(aluno).redacoes.media == 1000.0
+
+
 if __name__ == "__main__":
     testar_montar_e_buscar()
     testar_simulado_invalido()
@@ -129,4 +163,6 @@ if __name__ == "__main__":
     testar_resultado_questao_por_questao()
     testar_resultado_conta_so_o_simulado()
     testar_resultados_dos_alunos()
+    testar_simulado_com_redacao()
+    testar_simulado_so_de_redacao_conta_como_feito()
     print("Todos os testes de simulado passaram.")

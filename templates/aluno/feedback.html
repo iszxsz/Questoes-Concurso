@@ -7,21 +7,30 @@
 <div class="card">
     {{ cabecalho_questao(questao) }}
 
-    <div class="veredito">
-        {{ tag_situacao(resposta) }}
-        <p>
-            Você marcou <strong>{{ resposta.resposta }}) {{ questao.texto_da_opcao(resposta.resposta) }}</strong>.
-            {% if resposta.acertou %}
-                Parabéns!
-            {% else %}
-                A resposta correta é <strong>{{ questao.gabarito }}) {{ questao.texto_da_opcao(questao.gabarito) }}</strong>.
-            {% endif %}
-        </p>
-    </div>
+    {% if questao.CORRECAO_AUTOMATICA %}
+        <div class="veredito">
+            {{ tag_situacao(resposta) }}
+            <p>
+                Você marcou <strong>{{ resposta.resposta }}) {{ questao.texto_da_opcao(resposta.resposta) }}</strong>.
+                {% if resposta.acertou %}
+                    Parabéns!
+                {% else %}
+                    A resposta correta é <strong>{{ questao.gabarito }}) {{ questao.texto_da_opcao(questao.gabarito) }}</strong>.
+                {% endif %}
+            </p>
+        </div>
 
-    {{ texto_longo(questao.enunciado) }}
+        {{ texto_longo(questao.enunciado) }}
 
-    {{ opcoes_corrigidas(questao, resposta) }}
+        {{ opcoes_corrigidas(questao, resposta) }}
+    {% else %}
+        <div class="veredito">
+            {{ tag_situacao(resposta) }}
+            <p>Redação enviada. A nota aparece em <a href="/aluno/redacoes/{{ resposta.id }}">sua redação</a> assim que o professor corrigir.</p>
+        </div>
+
+        {{ texto_longo(questao.enunciado) }}
+    {% endif %}
 
     <div class="acoes">
         {# por enquanto volta pra lista, o controller não manda qual é a próxima. id + 1 daria 404 na última questão. ver com a Maria na T12 #}

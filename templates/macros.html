@@ -63,3 +63,29 @@
         {% endfor %}
     </div>
 {% endmacro %}
+
+
+{# objetiva mostra as opções, redação mostra a folha pra escrever #}
+{% macro campo_resposta(questao, nome_campo="resposta", marcada=None) %}
+    {% if questao.CORRECAO_AUTOMATICA %}
+        {{ opcoes_resposta(questao, nome_campo, marcada) }}
+    {% else %}
+        <div class="form-grupo">
+            <label class="rotulo" for="{{ nome_campo }}">Sua redação</label>
+            <textarea class="folha-redacao" id="{{ nome_campo }}" name="{{ nome_campo }}" minlength="{{ questao.MINIMO_CARACTERES }}" required>{{ marcada or "" }}</textarea>
+            <p class="ajuda">Mínimo de {{ questao.MINIMO_CARACTERES }} caracteres. Depois de enviar, o professor corrige.</p>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+
+{% macro nota_correcao(correcao) %}
+    <p class="nota-redacao">{{ correcao.nota }} <small>de {{ correcao.nota_maxima() }}</small></p>
+    <ul class="competencias">
+        {% for nome, nota in correcao.itens() %}
+            <li><span>{{ loop.index }}. {{ nome }}</span> <strong>{{ nota }}</strong></li>
+        {% endfor %}
+    </ul>
+    <p class="rotulo">Comentário do professor</p>
+    <div class="comentario-professor">{{ correcao.comentario }}</div>
+{% endmacro %}

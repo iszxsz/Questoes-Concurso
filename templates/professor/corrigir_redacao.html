@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% from "macros.html" import cabecalho_questao, texto_longo, tag_situacao, nota_correcao %}
+
+{% block titulo %}Redação de {{ aluno.nome }}{% endblock %}
+
+{% block conteudo %}
+<h1>Redação de {{ aluno.nome }}</h1>
+<p class="subtitulo">Enviada em {{ resposta.data_formatada }} {{ tag_situacao(resposta) }}</p>
+
+<div class="card">
+    {{ cabecalho_questao(questao) }}
+    <p class="rotulo">Tema</p>
+    {{ texto_longo(questao.enunciado) }}
+</div>
+
+<div class="card">
+    <p class="rotulo">Texto do aluno</p>
+    {{ texto_longo(resposta.resposta) }}
+</div>
+
+<div class="card">
+    {% if resposta.corrigida %}
+        <h2>Correção</h2>
+        <p class="ajuda">Corrigida em {{ resposta.data_correcao_formatada }}.</p>
+        {{ nota_correcao(resposta.correcao) }}
+    {% else %}
+        <h2>Corrigir</h2>
+        <form method="post" action="/professor/redacoes/{{ resposta.id }}">
+            <ul class="competencias">
+                {% for competencia in competencias %}
+                    {% set campo = "competencia_" ~ loop.index %}
+                    <li>
+                        <label for="{{ campo }}">{{ loop.index }}. {{ competencia }}</label>
+                        <div class="form-grupo">
+                            <select id="{{ campo }}" name="{{ campo }}" required>
+                                <option value="">Nota</option>
+                                {% for nivel in niveis %}
+                                    <option value="{{ nivel }}" {% if dados.get(campo) == nivel|string %}selected{% endif %}>{{ nivel }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <div class="form-grupo">
+                <label class="rotulo" for="comentario">Comentário para o aluno</label>
+                <textarea id="comentario" name="comentario" required>{{ dados.get("comentario", "") }}</textarea>
+                <p class="ajuda">Obrigatório. Aponte o que foi bem e o que melhorar.</p>
+            </div>
+
+            <div class="acoes">
+                <button type="submit" class="btn">Salvar correção</button>
+                <a class="btn btn-secundario" href="/professor/redacoes">Voltar</a>
+            </div>
+        </form>
+    {% endif %}
+</div>
+
+{% if resposta.corrigida %}
+    <div class="acoes">
+        <a class="btn btn-secundario" href="/professor/redacoes">Voltar para redações</a>
+    </div>
+{% endif %}
+{% endblock %}

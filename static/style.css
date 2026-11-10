@@ -880,6 +880,68 @@ label.alternativa:hover {
     background: var(--terracota-clara);
 }
 
+.tag-pendente {
+    color: #8a6418;
+    background: var(--mostarda-clara);
+}
+
+.tag-corrigida {
+    color: var(--tinta);
+    background: var(--folha-escura);
+}
+
+/* ---------------- redação ---------------- */
+
+/* folha de redação: mais alta que o textarea normal */
+.form-grupo textarea.folha-redacao {
+    min-height: 420px;
+}
+
+.nota-redacao {
+    font-family: var(--fonte-titulo);
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.nota-redacao small {
+    font-size: 1rem;
+    color: var(--tinta-suave);
+}
+
+.competencias {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+}
+
+.competencias li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--linha);
+}
+
+.competencias li strong {
+    font-family: var(--fonte-titulo);
+    font-size: 1.15rem;
+    white-space: nowrap;
+}
+
+.competencias .form-grupo {
+    flex: 0 0 120px;
+    margin: 0;
+}
+
+.comentario-professor {
+    padding: 12px 16px;
+    border-left: 4px solid var(--mostarda);
+    background: var(--folha);
+    white-space: pre-line;
+}
+
 /* ---------------- barra fixa de envio (simulado) ---------------- */
 
 .acoes-fixas {

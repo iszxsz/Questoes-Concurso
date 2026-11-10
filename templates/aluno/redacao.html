@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "macros.html" import cabecalho_questao, texto_longo, tag_situacao, nota_correcao %}
+
+{% block titulo %}Minha redação{% endblock %}
+
+{% block conteudo %}
+<h1>Minha redação</h1>
+<p class="subtitulo">Enviada em {{ resposta.data_formatada }} {{ tag_situacao(resposta) }}</p>
+
+<div class="card">
+    {% if resposta.corrigida %}
+        <h2>Correção</h2>
+        <p class="ajuda">Corrigida em {{ resposta.data_correcao_formatada }}.</p>
+        {{ nota_correcao(resposta.correcao) }}
+    {% else %}
+        <h2>Aguardando correção</h2>
+        <p>O professor ainda não corrigiu. Volte mais tarde para ver a nota e o comentário.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    {{ cabecalho_questao(questao) }}
+    <p class="rotulo">Tema</p>
+    {{ texto_longo(questao.enunciado) }}
+</div>
+
+<div class="card">
+    <p class="rotulo">Seu texto</p>
+    {{ texto_longo(resposta.resposta) }}
+</div>
+
+<div class="acoes">
+    <a class="btn btn-secundario" href="/aluno/resultados">Meus resultados</a>
+    <a class="btn btn-secundario" href="/aluno/questoes">Voltar para questões</a>
+</div>
+{% endblock %}

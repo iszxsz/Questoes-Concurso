@@ -14,6 +14,15 @@
         <span class="legenda">de aproveitamento</span>
         <span class="barra" aria-hidden="true"><span style="width: {{ [[desempenho.geral.percentual, 0]|max, 100]|min }}%"></span></span>
     </div>
+    {% if desempenho.redacoes.quantidade > 0 or desempenho.redacoes.pendentes > 0 %}
+        <div class="card">
+            <div class="numero-destaque">{{ desempenho.redacoes.media }}</div>
+            <span class="legenda">
+                média em {{ desempenho.redacoes.quantidade }} {{ "redação corrigida" if desempenho.redacoes.quantidade == 1 else "redações corrigidas" }}
+                {% if desempenho.redacoes.pendentes %}({{ desempenho.redacoes.pendentes }} aguardando){% endif %}
+            </span>
+        </div>
+    {% endif %}
 </div>
 
 <h2>Por disciplina</h2>
