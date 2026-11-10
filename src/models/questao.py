@@ -1,18 +1,29 @@
-import json
+"""Classe base de todas as questões e acesso à tabela questao."""
+
 from abc import ABC, abstractmethod
 
 from src import database
 
 
 class Questao(ABC):
-    """Base de todos os tipos de questão objetiva."""
+    """Base de todos os tipos de questão: dados comuns, banco e buscas.
+
+    Cada tipo diz como valida e corrige a resposta do aluno. As objetivas
+    herdam de QuestaoObjetiva e a redação herda direto daqui.
+
+    Attributes:
+        TIPO (str | None): valor gravado na coluna tipo; cada subclasse define o seu.
+        CORRECAO_AUTOMATICA (bool | None): True se o sistema corrige sozinho.
+    """
 
     TIPO = None
     NOME_TIPO = None
+    CORRECAO_AUTOMATICA = None
     ANO_MINIMO = 1990
     ANO_MAXIMO = 2100
 
-    def __init__(self, enunciado, disciplina, banca, ano, professor_id, gabarito, id=None):
+    def __init__(self, enunciado, disciplina, banca, ano, professor_id, id=None):
+        """Limpa os textos e valida enunciado, disciplina, banca e ano."""
         self.id = id
         self.enunciado = enunciado.strip()
         self.disciplina = disciplina.strip()
@@ -29,16 +40,16 @@ class Questao(ABC):
         if self.ano < self.ANO_MINIMO or self.ano > self.ANO_MAXIMO:
             raise ValueError("Informe um ano válido.")
 
-        self.gabarito = str(gabarito).strip().upper()
-        if self.gabarito not in self.valores_validos:
-            raise ValueError("O gabarito deve ser um destes: " + ", ".join(self.valores_validos) + ".")
-
     def __str__(self):
         return f"{self.disciplina} · {self.banca} · {self.ano}"
 
     @abstractmethod
-    def opcoes(self):
-        """Lista de pares (valor, texto) das opções da questão."""
+    def validar_resposta(self, resposta):
+        """Devolve a resposta limpa, ou lança ValueError se ela não servir."""
+
+    @abstractmethod
+    def corrigir(self, resposta):
+        """Devolve a situação da resposta: "correta", "errada" ou "pendente"."""
 
     def para_formulario(self):
         """Campos comuns da questão no formato do formulário, para editar."""
@@ -47,40 +58,15 @@ class Questao(ABC):
             "disciplina": self.disciplina,
             "banca": self.banca,
             "ano": str(self.ano),
-            "gabarito": self.gabarito,
         }
 
-    def alternativas_em_texto(self):
+    def _alternativas_em_texto(self):
         """Alternativas no formato gravado no banco; None para tipos sem alternativas."""
         return None
 
-    @property
-    def valores_validos(self):
-        """Valores das opções, por exemplo ["A", "B", "C"]."""
-        valores = []
-        for valor, texto in self.opcoes():
-            valores.append(valor)
-        return valores
-
-    def texto_da_opcao(self, valor):
-        """Texto da opção com esse valor, ou o próprio valor se ela não existir."""
-        for valor_opcao, texto in self.opcoes():
-            if valor_opcao == valor:
-                return texto
-        return valor
-
-    def validar_resposta(self, resposta):
-        """Devolve a resposta limpa, ou lança ValueError se não for uma das opções."""
-        resposta = str(resposta or "").strip().upper()
-        if resposta not in self.valores_validos:
-            raise ValueError("Marque uma das opções.")
-        return resposta
-
-    def corrigir(self, resposta):
-        """Devolve "correta" ou "errada" comparando a resposta com o gabarito."""
-        if self.validar_resposta(resposta) == self.gabarito:
-            return "correta"
-        return "errada"
+    def _gabarito_em_texto(self):
+        """Gabarito no formato gravado no banco; None para tipos sem gabarito."""
+        return None
 
     def salvar(self):
         """Insere a questão no banco e preenche o id."""
@@ -95,8 +81,8 @@ class Questao(ABC):
                 self.banca,
                 self.ano,
                 self.professor_id,
-                self.alternativas_em_texto(),
-                self.gabarito,
+                self._alternativas_em_texto(),
+                self._gabarito_em_texto(),
             ),
         )
         conexao.commit()
@@ -114,8 +100,8 @@ class Questao(ABC):
                 self.disciplina,
                 self.banca,
                 self.ano,
-                self.alternativas_em_texto(),
-                self.gabarito,
+                self._alternativas_em_texto(),
+                self._gabarito_em_texto(),
                 self.id,
             ),
         )
@@ -148,31 +134,22 @@ class Questao(ABC):
 
     @staticmethod
     def de_linha(linha):
-        """Cria o objeto do tipo certo a partir de uma linha da tabela questao."""
+        """Cria o objeto do tipo certo a partir de uma linha da tabela questao.
+
+        Cada subclasse sabe montar a si mesma com _montar_de_linha; aqui só
+        escolhe a classe pela coluna tipo.
+        """
         # import aqui dentro pra não dar importação circular
         from src.models.questao_certo_errado import QuestaoCertoErrado
         from src.models.questao_multipla import QuestaoMultipla
+        from src.models.redacao import Redacao
 
-        if linha["tipo"] == QuestaoMultipla.TIPO:
-            return QuestaoMultipla(
-                linha["enunciado"],
-                linha["disciplina"],
-                linha["banca"],
-                linha["ano"],
-                linha["professor_id"],
-                json.loads(linha["alternativas"]),
-                linha["gabarito"],
-                linha["id"],
-            )
-        return QuestaoCertoErrado(
-            linha["enunciado"],
-            linha["disciplina"],
-            linha["banca"],
-            linha["ano"],
-            linha["professor_id"],
-            linha["gabarito"],
-            linha["id"],
-        )
+        classes = {
+            QuestaoMultipla.TIPO: QuestaoMultipla,
+            QuestaoCertoErrado.TIPO: QuestaoCertoErrado,
+            Redacao.TIPO: Redacao,
+        }
+        return classes[linha["tipo"]]._montar_de_linha(linha)
 
     @staticmethod
     def buscar_por_id(questao_id):

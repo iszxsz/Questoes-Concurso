@@ -21,7 +21,7 @@ class Usuario:
         self.id = id
         self.nome = Usuario.validar_nome(nome)
         self.email = Usuario.validar_email(email)
-        self.senha_hash = senha_hash
+        self._senha_hash = senha_hash
 
     def __str__(self):
         """Representa o usuário pelo nome."""
@@ -56,7 +56,7 @@ class Usuario:
 
     def verificar_senha(self, senha):
         """True se a senha informada confere com o hash guardado."""
-        return check_password_hash(self.senha_hash, senha)
+        return check_password_hash(self._senha_hash, senha)
 
     def salvar(self):
         """Insere o usuário com o TIPO da subclasse e preenche o id.
@@ -74,7 +74,7 @@ class Usuario:
             cursor = conexao.execute(
                 "INSERT INTO usuario (nome, email, senha_hash, tipo, matricula) "
                 "VALUES (?, ?, ?, ?, ?)",
-                (self.nome, self.email, self.senha_hash, self.TIPO, matricula),
+                (self.nome, self.email, self._senha_hash, self.TIPO, matricula),
             )
             conexao.commit()
             self.id = cursor.lastrowid

@@ -2,10 +2,10 @@
 
 import json
 
-from src.models.questao import Questao
+from src.models.questao_objetiva import QuestaoObjetiva
 
 
-class QuestaoMultipla(Questao):
+class QuestaoMultipla(QuestaoObjetiva):
     """Questão com alternativas identificadas pelas letras A a E."""
 
     TIPO = "multipla"
@@ -13,7 +13,13 @@ class QuestaoMultipla(Questao):
     LETRAS = "ABCDE"
 
     def __init__(self, enunciado, disciplina, banca, ano, professor_id, alternativas, gabarito, id=None):
-        """Limpa e valida as alternativas antes de chamar a base."""
+        """Valida as alternativas antes de chamar a base, que confere o gabarito por elas."""
+        self.alternativas = self.__validar_alternativas(alternativas)
+        super().__init__(enunciado, disciplina, banca, ano, professor_id, gabarito, id)
+
+    def __validar_alternativas(self, alternativas):
+        """Tira os espaços e as vazias do fim, e lança ValueError se sobrar buraco
+        no meio ou se a quantidade não for de 2 a 5."""
         limpas = []
         for texto in alternativas:
             limpas.append(texto.strip())
@@ -25,9 +31,7 @@ class QuestaoMultipla(Questao):
             raise ValueError("Preencha as alternativas em ordem, sem pular letras.")
         if len(limpas) < 2 or len(limpas) > len(self.LETRAS):
             raise ValueError("A questão deve ter de 2 a 5 alternativas.")
-
-        self.alternativas = limpas
-        super().__init__(enunciado, disciplina, banca, ano, professor_id, gabarito, id)
+        return limpas
 
     def opcoes(self):
         """Pares (letra, texto) de cada alternativa."""
@@ -54,6 +58,20 @@ class QuestaoMultipla(Questao):
             id,
         )
 
+    @classmethod
+    def _montar_de_linha(cls, linha):
+        """Cria a questão a partir de uma linha da tabela, lendo as alternativas do JSON."""
+        return cls(
+            linha["enunciado"],
+            linha["disciplina"],
+            linha["banca"],
+            linha["ano"],
+            linha["professor_id"],
+            json.loads(linha["alternativas"]),
+            linha["gabarito"],
+            linha["id"],
+        )
+
     def para_formulario(self):
         """Campos comuns mais um campo para cada alternativa."""
         dados = super().para_formulario()
@@ -61,6 +79,6 @@ class QuestaoMultipla(Questao):
             dados["alternativa_" + letra.lower()] = texto
         return dados
 
-    def alternativas_em_texto(self):
+    def _alternativas_em_texto(self):
         """Alternativas em JSON, como ficam gravadas no banco."""
         return json.dumps(self.alternativas, ensure_ascii=False)
