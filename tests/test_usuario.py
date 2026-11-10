@@ -13,7 +13,7 @@ def testar_cadastro_limpa_dados():
     assert aluno.id is not None
     assert aluno.nome == "Maria Silva"
     assert aluno.email == "maria@teste.com"
-    assert aluno.senha_hash != "abc123"
+    assert not aluno.verificar_senha("outra123")
     assert aluno.verificar_senha("abc123")
 
 

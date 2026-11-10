@@ -5,7 +5,22 @@ from src.models.questao_certo_errado import QuestaoCertoErrado
 from src.models.questao_multipla import QuestaoMultipla
 from src.models.resposta import Resposta
 from src.models.simulado import Simulado
-from tests.apoio import criar_cenario, deve_recusar
+from tests.apoio import criar_cenario, criar_redacao, deve_recusar
+
+
+def testar_editar_redacao():
+    aluno, multipla, certo_errado = criar_cenario()
+    redacao = criar_redacao(multipla.professor_id)
+
+    dados = redacao.para_formulario()
+    assert "gabarito" not in dados
+    dados["enunciado"] = "O lixo eletrônico no Brasil"
+    editada = redacao.de_formulario(dados, redacao.professor_id, redacao.id)
+    editada.atualizar()
+
+    salva = Questao.buscar_por_id(redacao.id)
+    assert salva.enunciado == "O lixo eletrônico no Brasil"
+    assert salva.NOME_TIPO == "Redação"
 
 
 def testar_formulario_ida_e_volta():
@@ -85,4 +100,5 @@ if __name__ == "__main__":
     testar_excluir_questao_sem_respostas()
     testar_excluir_questao_com_respostas_bloqueado()
     testar_excluir_questao_que_esta_em_simulado()
+    testar_editar_redacao()
     print("Todos os testes de manutenção de questão passaram.")
