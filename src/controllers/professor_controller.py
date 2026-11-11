@@ -7,7 +7,7 @@ from src.models.aluno import Aluno
 from src.models.correcao_redacao import CorrecaoRedacao
 from src.models.desempenho import Desempenho
 from src.models.questao import Questao
-from src.models.questao_certo_errado import QuestaoCertoErrado
+from src.models.questao_verdadeiro_falso import QuestaoVerdadeiroFalso
 from src.models.questao_multipla import QuestaoMultipla
 from src.models.redacao import Redacao
 from src.models.resposta import Resposta
@@ -24,7 +24,7 @@ class ProfessorController(Controller):
     TIPO_USUARIO = "professor"
     FORMULARIOS = {
         QuestaoMultipla.TIPO: "professor/nova_multipla.html",
-        QuestaoCertoErrado.TIPO: "professor/nova_certo_errado.html",
+        QuestaoVerdadeiroFalso.TIPO: "professor/nova_verdadeiro_falso.html",
         Redacao.TIPO: "professor/nova_redacao.html",
     }
 
@@ -39,9 +39,9 @@ class ProfessorController(Controller):
             ("GET", "POST"),
         )
         self._adicionar_rota(
-            "/professor/questoes/nova-certo-errado",
-            "professor_nova_certo_errado",
-            self.nova_certo_errado,
+            "/professor/questoes/nova-verdadeiro-falso",
+            "professor_nova_verdadeiro_falso",
+            self.nova_verdadeiro_falso,
             ("GET", "POST"),
         )
         self._adicionar_rota(
@@ -120,14 +120,14 @@ class ProfessorController(Controller):
             "professor/nova_multipla.html", dados=dados, letras=QuestaoMultipla.LETRAS
         )
 
-    def nova_certo_errado(self):
-        """Mostra o formulário e cadastra uma questão de certo ou errado."""
+    def nova_verdadeiro_falso(self):
+        """Mostra o formulário e cadastra uma questão de verdadeiro ou falso."""
         dados = {}
 
         if request.method == "POST":
             dados = request.form.to_dict()
             try:
-                questao = QuestaoCertoErrado.de_formulario(dados, self.usuario.id)
+                questao = QuestaoVerdadeiroFalso.de_formulario(dados, self.usuario.id)
                 questao.salvar()
             except ValueError as erro:
                 self._avisar_erro(str(erro))
@@ -137,7 +137,7 @@ class ProfessorController(Controller):
                 )
 
         return self._renderizar(
-            "professor/nova_certo_errado.html", dados=dados, opcoes=QuestaoCertoErrado.OPCOES
+            "professor/nova_verdadeiro_falso.html", dados=dados, opcoes=QuestaoVerdadeiroFalso.OPCOES
         )
 
     def nova_redacao(self):
@@ -185,7 +185,7 @@ class ProfessorController(Controller):
             dados=dados,
             questao=questao,
             letras=QuestaoMultipla.LETRAS,
-            opcoes=QuestaoCertoErrado.OPCOES,
+            opcoes=QuestaoVerdadeiroFalso.OPCOES,
             competencias=Redacao.COMPETENCIAS,
         )
 

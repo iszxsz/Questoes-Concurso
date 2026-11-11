@@ -5,7 +5,7 @@ import os
 from src import database
 from src.models.aluno import Aluno
 from src.models.professor import Professor
-from src.models.questao_certo_errado import QuestaoCertoErrado
+from src.models.questao_verdadeiro_falso import QuestaoVerdadeiroFalso
 from src.models.questao_multipla import QuestaoMultipla
 from src.models.redacao import Redacao
 from src.models.usuario import Usuario
@@ -46,7 +46,7 @@ def criar_cenario():
     """Prepara o banco e cria um professor, um aluno e uma questão de cada tipo.
 
     Returns:
-        tuple: (aluno, multipla, certo_errado).
+        tuple: (aluno, multipla, verdadeiro_falso).
     """
     preparar_banco()
 
@@ -68,17 +68,17 @@ def criar_cenario():
     )
     multipla.salvar()
 
-    certo_errado = QuestaoCertoErrado(
+    verdadeiro_falso = QuestaoVerdadeiroFalso(
         "Todo o poder emana do povo.",
         "Direito Constitucional",
         "Cebraspe",
         2022,
         professor.id,
-        "C",
+        "V",
     )
-    certo_errado.salvar()
+    verdadeiro_falso.salvar()
 
-    return aluno, multipla, certo_errado
+    return aluno, multipla, verdadeiro_falso
 
 
 def criar_redacao(professor_id):

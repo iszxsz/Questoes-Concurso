@@ -34,7 +34,7 @@ def testar_cadastro_recusado():
 
 
 def testar_autenticacao():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
 
     entrou = Usuario.autenticar(" ALUNO@Teste.com ", SENHA_TESTE)
     assert isinstance(entrou, Aluno)
@@ -45,7 +45,7 @@ def testar_autenticacao():
 
 
 def testar_busca_de_professor():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
 
     professor = Usuario.buscar_por_id(multipla.professor_id)
     assert isinstance(professor, Professor)

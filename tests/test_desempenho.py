@@ -6,7 +6,7 @@ from tests.apoio import criar_cenario
 
 
 def testar_aluno_sem_respostas():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
 
     desempenho = Desempenho.do_aluno(aluno)
     assert desempenho.aluno is aluno
@@ -17,10 +17,10 @@ def testar_aluno_sem_respostas():
 
 
 def testar_tres_respostas():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
     Resposta.registrar(aluno.id, multipla, "B")
     Resposta.registrar(aluno.id, multipla, "A")
-    Resposta.registrar(aluno.id, certo_errado, "C")
+    Resposta.registrar(aluno.id, verdadeiro_falso, "V")
 
     desempenho = Desempenho.do_aluno(aluno)
     assert desempenho.geral.total == 3

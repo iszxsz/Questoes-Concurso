@@ -9,7 +9,7 @@ from tests.apoio import TEXTO_REDACAO, criar_cenario, criar_redacao, deve_recusa
 
 
 def testar_redacao_e_uma_questao():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
     redacao = criar_redacao(multipla.professor_id)
 
     assert isinstance(redacao, Questao)
@@ -23,7 +23,7 @@ def testar_redacao_e_uma_questao():
 
 
 def testar_texto_curto_recusado():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
     redacao = criar_redacao(multipla.professor_id)
 
     mensagem = deve_recusar(Resposta.registrar, aluno.id, redacao, "Texto curto demais.")
@@ -33,7 +33,7 @@ def testar_texto_curto_recusado():
 
 
 def testar_redacao_fica_pendente():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
     redacao = criar_redacao(multipla.professor_id)
 
     resposta = Resposta.registrar(aluno.id, redacao, "  " + TEXTO_REDACAO + "  ")
@@ -80,7 +80,7 @@ def testar_correcao_do_formulario():
 
 
 def testar_professor_corrige():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
     redacao = criar_redacao(multipla.professor_id)
     resposta = Resposta.registrar(aluno.id, redacao, TEXTO_REDACAO)
 
@@ -97,7 +97,7 @@ def testar_professor_corrige():
 
 
 def testar_nao_corrige_duas_vezes_nem_objetiva():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
     redacao = criar_redacao(multipla.professor_id)
     resposta = Resposta.registrar(aluno.id, redacao, TEXTO_REDACAO)
     correcao = CorrecaoRedacao([200, 200, 200, 200, 200], "Nota máxima.")
@@ -112,7 +112,7 @@ def testar_nao_corrige_duas_vezes_nem_objetiva():
 
 
 def testar_desempenho_com_redacao():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
     redacao = criar_redacao(multipla.professor_id)
 
     Resposta.registrar(aluno.id, multipla, "B")
@@ -141,7 +141,7 @@ def deve_ser_so_leitura(objeto, atributo, valor):
 
 
 def testar_encapsulamento():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
     redacao = criar_redacao(multipla.professor_id)
     resposta = Resposta.registrar(aluno.id, redacao, TEXTO_REDACAO)
 

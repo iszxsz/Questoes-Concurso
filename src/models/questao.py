@@ -140,13 +140,13 @@ class Questao(ABC):
         escolhe a classe pela coluna tipo.
         """
         # import aqui dentro pra não dar importação circular
-        from src.models.questao_certo_errado import QuestaoCertoErrado
+        from src.models.questao_verdadeiro_falso import QuestaoVerdadeiroFalso
         from src.models.questao_multipla import QuestaoMultipla
         from src.models.redacao import Redacao
 
         classes = {
             QuestaoMultipla.TIPO: QuestaoMultipla,
-            QuestaoCertoErrado.TIPO: QuestaoCertoErrado,
+            QuestaoVerdadeiroFalso.TIPO: QuestaoVerdadeiroFalso,
             Redacao.TIPO: Redacao,
         }
         return classes[linha["tipo"]]._montar_de_linha(linha)

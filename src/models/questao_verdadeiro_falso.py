@@ -1,21 +1,21 @@
-"""Questão de certo ou errado."""
+"""Questão de verdadeiro ou falso."""
 
 from src.models.questao_objetiva import QuestaoObjetiva
 
 
-class QuestaoCertoErrado(QuestaoObjetiva):
-    """Afirmação que o aluno julga como certa ou errada, no estilo Cebraspe."""
+class QuestaoVerdadeiroFalso(QuestaoObjetiva):
+    """Afirmação que o aluno julga como verdadeira ou falsa."""
 
-    TIPO = "certo_errado"
-    NOME_TIPO = "Certo ou errado"
-    OPCOES = (("C", "Certo"), ("E", "Errado"))
+    TIPO = "verdadeiro_falso"
+    NOME_TIPO = "Verdadeiro ou falso"
+    OPCOES = (("V", "Verdadeiro"), ("F", "Falso"))
 
     def __init__(self, enunciado, disciplina, banca, ano, professor_id, gabarito, id=None):
         """Usa o construtor de Questao, que limpa e valida os dados."""
         super().__init__(enunciado, disciplina, banca, ano, professor_id, gabarito, id)
 
     def opcoes(self):
-        """Pares (valor, texto) das duas opções: C (Certo) e E (Errado)."""
+        """Pares (valor, texto) das duas opções: V (Verdadeiro) e F (Falso)."""
         return list(self.OPCOES)
 
     @classmethod

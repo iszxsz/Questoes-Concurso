@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS usuario (
 
 CREATE TABLE IF NOT EXISTS questao (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    tipo TEXT NOT NULL CHECK (tipo IN ('multipla', 'certo_errado', 'redacao')),
+    tipo TEXT NOT NULL CHECK (tipo IN ('multipla', 'verdadeiro_falso', 'redacao')),
     enunciado TEXT NOT NULL,
     disciplina TEXT NOT NULL,
     banca TEXT NOT NULL,
