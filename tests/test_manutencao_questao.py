@@ -1,7 +1,7 @@
 """Testes de edição e exclusão de questões."""
 
 from src.models.questao import Questao
-from src.models.questao_certo_errado import QuestaoCertoErrado
+from src.models.questao_verdadeiro_falso import QuestaoVerdadeiroFalso
 from src.models.questao_multipla import QuestaoMultipla
 from src.models.resposta import Resposta
 from src.models.simulado import Simulado
@@ -9,7 +9,7 @@ from tests.apoio import criar_cenario, criar_redacao, deve_recusar
 
 
 def testar_editar_redacao():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
     redacao = criar_redacao(multipla.professor_id)
 
     dados = redacao.para_formulario()
@@ -24,7 +24,7 @@ def testar_editar_redacao():
 
 
 def testar_formulario_ida_e_volta():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
 
     dados = multipla.para_formulario()
     assert dados["alternativa_b"] == "exceção"
@@ -34,14 +34,14 @@ def testar_formulario_ida_e_volta():
     assert copia.alternativas == multipla.alternativas
     assert copia.gabarito == "B"
 
-    dados = certo_errado.para_formulario()
+    dados = verdadeiro_falso.para_formulario()
     assert "alternativa_a" not in dados
-    copia = QuestaoCertoErrado.de_formulario(dados, certo_errado.professor_id)
-    assert copia.gabarito == "C"
+    copia = QuestaoVerdadeiroFalso.de_formulario(dados, verdadeiro_falso.professor_id)
+    assert copia.gabarito == "V"
 
 
 def testar_editar_questao():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
 
     dados = multipla.para_formulario()
     dados["enunciado"] = "Enunciado novo"
@@ -57,17 +57,17 @@ def testar_editar_questao():
 
 
 def testar_edicao_invalida():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
 
-    dados = certo_errado.para_formulario()
+    dados = verdadeiro_falso.para_formulario()
     dados["gabarito"] = "A"
-    mensagem = deve_recusar(QuestaoCertoErrado.de_formulario, dados, 1, certo_errado.id)
-    assert mensagem == "O gabarito deve ser um destes: C, E."
-    assert Questao.buscar_por_id(certo_errado.id).gabarito == "C"
+    mensagem = deve_recusar(QuestaoVerdadeiroFalso.de_formulario, dados, 1, verdadeiro_falso.id)
+    assert mensagem == "O gabarito deve ser um destes: V, F."
+    assert Questao.buscar_por_id(verdadeiro_falso.id).gabarito == "V"
 
 
 def testar_excluir_questao_sem_respostas():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
     assert not multipla.tem_respostas()
 
     multipla.excluir()
@@ -76,7 +76,7 @@ def testar_excluir_questao_sem_respostas():
 
 
 def testar_excluir_questao_com_respostas_bloqueado():
-    aluno, multipla, certo_errado = criar_cenario()
+    aluno, multipla, verdadeiro_falso = criar_cenario()
     Resposta.registrar(aluno.id, multipla, "A")
     assert multipla.tem_respostas()
 
@@ -86,8 +86,8 @@ def testar_excluir_questao_com_respostas_bloqueado():
 
 
 def testar_excluir_questao_que_esta_em_simulado():
-    aluno, multipla, certo_errado = criar_cenario()
-    simulado = Simulado.montar("Simulado", multipla.professor_id, [multipla.id, certo_errado.id])
+    aluno, multipla, verdadeiro_falso = criar_cenario()
+    simulado = Simulado.montar("Simulado", multipla.professor_id, [multipla.id, verdadeiro_falso.id])
 
     multipla.excluir()
     assert len(Simulado.buscar_por_id(simulado.id)) == 1

@@ -88,7 +88,7 @@ QUESTOES_MULTIPLA = [
     },
 ]
 
-QUESTOES_CERTO_ERRADO = [
+QUESTOES_VERDADEIRO_FALSO = [
     {
         "id": 7,
         "disciplina": "Direito Constitucional",
@@ -98,7 +98,7 @@ QUESTOES_CERTO_ERRADO = [
             "Segundo a Constituição Federal de 1988, todo o poder emana do povo, "
             "que o exerce por meio de representantes eleitos ou diretamente."
         ),
-        "gabarito": "C",
+        "gabarito": "V",
     },
     {
         "id": 8,
@@ -106,7 +106,7 @@ QUESTOES_CERTO_ERRADO = [
         "banca": "Cebraspe",
         "ano": 2023,
         "enunciado": 'Na oração "Choveu muito ontem", o sujeito é oculto.',
-        "gabarito": "E",
+        "gabarito": "F",
     },
 ]
 
@@ -219,18 +219,18 @@ def inserir_questoes_multipla(conexao, professor_id):
         )
 
 
-def inserir_questoes_certo_errado(conexao, professor_id):
-    """Insere as questões de certo ou errado de exemplo, sem alternativas.
+def inserir_questoes_verdadeiro_falso(conexao, professor_id):
+    """Insere as questões de verdadeiro ou falso de exemplo, sem alternativas.
 
     Args:
         conexao (sqlite3.Connection): conexão aberta com o banco.
         professor_id (int): id do professor que fica como autor das questões.
     """
-    for questao in QUESTOES_CERTO_ERRADO:
+    for questao in QUESTOES_VERDADEIRO_FALSO:
         conexao.execute(
             "INSERT INTO questao (id, tipo, enunciado, disciplina, banca, ano, "
             "professor_id, gabarito) "
-            "VALUES (?, 'certo_errado', ?, ?, ?, ?, ?, ?)",
+            "VALUES (?, 'verdadeiro_falso', ?, ?, ?, ?, ?, ?)",
             (
                 questao["id"],
                 questao["enunciado"],
@@ -311,7 +311,7 @@ def main():
     aluno_id = inserir_usuario(conexao, ALUNO)
 
     inserir_questoes_multipla(conexao, professor_id)
-    inserir_questoes_certo_errado(conexao, professor_id)
+    inserir_questoes_verdadeiro_falso(conexao, professor_id)
     inserir_redacoes(conexao, professor_id)
     inserir_simulados(conexao, professor_id)
     inserir_redacao_pendente(conexao, aluno_id)
