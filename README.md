@@ -23,11 +23,15 @@ Feito em Python com Flask e SQLite.
 
 ## Tecnologias
 
-- Python 3.9+
-- Flask
-- SQLite (com o módulo `sqlite3`, sem ORM)
-- Jinja2 e CSS
-- pdoc para gerar a documentação
+| Tecnologia | Para que foi usada |
+| --- | --- |
+| Python 3.9+ | Linguagem do projeto |
+| Flask 3.1 | Servidor web e rotas |
+| SQLite | Banco de dados, acessado com o módulo `sqlite3` (sem ORM) |
+| Jinja2 | Templates das páginas HTML |
+| CSS | Estilo das páginas |
+| Werkzeug | Hash das senhas |
+| pdoc | Documentação gerada a partir das docstrings |
 
 ## Como rodar
 
@@ -94,24 +98,6 @@ Questoes-Concurso/
 
 ## Classes
 
-```mermaid
-classDiagram
-    Usuario <|-- Aluno
-    Usuario <|-- Professor
-
-    Questao <|-- QuestaoObjetiva
-    Questao <|-- Redacao
-    QuestaoObjetiva <|-- QuestaoMultipla
-    QuestaoObjetiva <|-- QuestaoVerdadeiroFalso
-
-    Desempenho <|-- ResultadoSimulado
-
-    Simulado o-- Questao
-    Resposta --> Questao
-    Resposta --> CorrecaoRedacao
-    Desempenho *-- Aproveitamento
-    Desempenho *-- NotasRedacao
-```
 
 - `Usuario`, `Aluno` e `Professor`: login, cadastro e senha
 - `Questao`: classe abstrata com o que toda questão tem (enunciado, disciplina, banca e ano)
@@ -169,6 +155,7 @@ Assim, `Resposta.registrar()` e `Simulado.responder()` chamam `questao.corrigir(
 
 ## Limitações até o momento
 
-- Não tem recuperação de senha.
-- Não tem migração de banco: se mudar as tabelas, precisa rodar o `seed.py` de novo.
-- O Flask está em modo de depuração, então não é para usar em produção.
+- **Recuperação de senha:** ainda não existe. Se o usuário esquecer a senha, não consegue entrar.
+- **Cadastro de professor:** não há tela para isso. Contas de professor precisam ser criadas direto no banco.
+- **Alterações no banco:** o projeto não tem migrações. Se a estrutura das tabelas mudar, o banco precisa ser recriado com o `seed.py`, o que apaga os dados.
+- **Uso em produção:** o servidor roda em modo de depuração e usa uma chave de sessão padrão (`SECRET_KEY`). Serve para estudo e testes locais, não para ser publicado como está.
